@@ -185,6 +185,15 @@ def alert_msg():
     """显示阻塞型对话框，并等待用户确认"""
     # 检查是否为自动模式
     args = parse_arguments()
+
+    # 尝试从配置文件加载配置
+    config = load_config_from_json()
+
+    # 如果命令行没有传入auto_mode，则从配置文件中获取
+    if args.auto_mode is None:
+        args.auto_mode = config.get('auto_mode', True)  # 默认为0，如果cfg中也没有
+        logger.info(f"从配置文件加载 auto_mode: {args.auto_mode}")
+
     if args.auto_mode:
         logger.info("自动模式：跳过用户交互，继续执行...")
         print("自动模式：跳过用户交互，继续执行...")
@@ -1067,6 +1076,12 @@ def main():
         if args.days is None:
             args.days = config.get('days', 0) # 默认为0，如果cfg中也没有
             logger.info(f"从配置文件加载days: {args.days}")
+
+        # 如果命令行没有传入auto_mode，则从配置文件中获取
+        if args.auto_mode is None:
+            args.auto_mode = config.get('auto_mode', True) # 默认为0，如果cfg中也没有
+            logger.info(f"从配置文件加载 auto_mode: {args.auto_mode}")
+
 
         # 显示目标群聊名称列表
         talker_names = [t['name'] for t in talkers]
