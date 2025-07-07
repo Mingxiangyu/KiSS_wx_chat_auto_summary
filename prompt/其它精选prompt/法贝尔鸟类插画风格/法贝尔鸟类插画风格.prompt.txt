@@ -279,6 +279,10 @@
             text-decoration: none;
             border-bottom: 1px dotted var(--accent-blue);
             transition: all 0.3s ease;
+            word-wrap: break-word;
+            word-break: break-all;
+            overflow-wrap: break-word;
+            hyphens: auto;
         }
 
         a:hover {
@@ -1718,8 +1722,9 @@
 
         try {
             await document.fonts.ready;
+            console.log('开始html2canvas截图...');
 
-            // 简化配置，提高兼容性
+            // 简化且稳定的配置
             const canvas = await html2canvas(elementToCapture, {
                 useCORS: true,
                 scale: window.devicePixelRatio || 1,
@@ -1729,9 +1734,17 @@
                 foreignObjectRendering: false,
                 imageTimeout: 15000,
                 removeContainer: true,
+                scrollX: 0,
+                scrollY: 0,
+                // 过滤不需要截图的交互元素
+                ignoreElements: function(element) {
+                    return element.classList.contains('action-buttons-container') ||
+                           element.id === 'feedback-message' ||
+                           element.classList.contains('modal-overlay');
+                },
                 onclone: function(clonedDoc, element) {
                     try {
-                        // 隐藏操作按钮和反馈消息
+                        // 隐藏交互元素
                         const actionButtons = clonedDoc.querySelector('.action-buttons-container');
                         const feedbackMsg = clonedDoc.querySelector('#feedback-message');
                         const modalOverlay = clonedDoc.querySelector('.modal-overlay');
@@ -1747,13 +1760,6 @@
                             clonedBody.style.overflow = 'visible';
                             clonedBody.style.position = 'static';
                         }
-
-                        // 处理可能导致问题的SVG元素
-                        const svgElements = clonedDoc.querySelectorAll('svg');
-                        svgElements.forEach(svg => {
-                            svg.style.overflow = 'visible';
-                        });
-
                     } catch (cloneError) {
                         console.warn('Clone处理出现警告:', cloneError);
                         // 不抛出错误，继续截图过程
@@ -1761,10 +1767,56 @@
                 }
             });
 
+            console.log('截图成功！');
             return canvas;
 
         } catch (error) {
             console.error('html2canvas错误详情:', error);
+
+            // 如果是常见的html2canvas错误，尝试简化的备用方案
+            if (error.message.includes('Unable to find element') ||
+                error.message.includes('createPattern') ||
+                error.message.includes('canvas element with a width or height of 0') ||
+                error.message.includes('cloned iframe')) {
+                console.log('检测到html2canvas兼容性问题，尝试简化的备用方案...');
+
+                try {
+                    // 简化的备用方案：使用最基本的配置重试
+                    const backupCanvas = await html2canvas(elementToCapture, {
+                        scale: 1,
+                        logging: false,
+                        backgroundColor: '#f2e8c9',
+                        allowTaint: true,
+                        useCORS: false,
+                        foreignObjectRendering: false,
+                        imageTimeout: 0,
+                        removeContainer: true,
+                        ignoreElements: function(element) {
+                            // 忽略所有可能有问题的元素
+                            return element.classList.contains('action-buttons-container') ||
+                                   element.id === 'feedback-message' ||
+                                   element.classList.contains('modal-overlay') ||
+                                   element.tagName === 'SCRIPT' ||
+                                   element.tagName === 'STYLE';
+                        }
+                    });
+
+                    console.log('简化备用方案成功！');
+                    return backupCanvas;
+
+                } catch (backupError) {
+                    console.error('备用方案也失败了:', backupError);
+
+                    // 提供用户友好的错误信息和解决建议
+                    throw new Error(`截图功能暂时不可用。建议解决方案：
+1. 刷新页面后重试
+2. 使用浏览器的打印功能（Ctrl+P）保存为PDF
+3. 使用浏览器的开发者工具手动截图
+
+技术详情：${backupError.message}`);
+                }
+            }
+
             // 提供更具体的错误信息
             if (error.message.includes('SecurityError')) {
                 throw new Error('截图失败：页面包含跨域内容，请确保所有资源都来自同一域名');

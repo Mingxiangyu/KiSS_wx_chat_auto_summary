@@ -189,9 +189,9 @@ def alert_msg():
     # 尝试从配置文件加载配置
     config = load_config_from_json()
 
-    # 如果命令行没有传入auto_mode，则从配置文件中获取
-    if args.auto_mode is None:
-        args.auto_mode = config.get('auto_mode', True)  # 默认为0，如果cfg中也没有
+    # 如果命令行没有传入auto_mode（即为False），则从配置文件中获取
+    if not args.auto_mode:
+        args.auto_mode = config.get('auto_mode', False)  # 默认为False，如果cfg中也没有
         logger.info(f"从配置文件加载 auto_mode: {args.auto_mode}")
 
     if args.auto_mode:
@@ -1077,10 +1077,12 @@ def main():
             args.days = config.get('days', 0) # 默认为0，如果cfg中也没有
             logger.info(f"从配置文件加载days: {args.days}")
 
-        # 如果命令行没有传入auto_mode，则从配置文件中获取
-        if args.auto_mode is None:
-            args.auto_mode = config.get('auto_mode', True) # 默认为0，如果cfg中也没有
+        # 如果命令行没有传入auto_mode（即为False），则从配置文件中获取
+        if not args.auto_mode:
+            args.auto_mode = config.get('auto_mode', False) # 默认为False，如果cfg中也没有
             logger.info(f"从配置文件加载 auto_mode: {args.auto_mode}")
+        else:
+            logger.info(f"从命令行参数获取 auto_mode: {args.auto_mode}")
 
 
         # 显示目标群聊名称列表
