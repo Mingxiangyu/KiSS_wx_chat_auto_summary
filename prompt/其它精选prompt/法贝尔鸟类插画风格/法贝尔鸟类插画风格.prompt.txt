@@ -1722,7 +1722,6 @@
 
         try {
             await document.fonts.ready;
-            console.log('开始html2canvas截图...');
 
             // 简化且稳定的配置
             const canvas = await html2canvas(elementToCapture, {
@@ -1760,25 +1759,31 @@
                             clonedBody.style.overflow = 'visible';
                             clonedBody.style.position = 'static';
                         }
+
+                        // 移除所有阴影效果，避免截图中出现灰色阴影
+                        const shadowStyle = clonedDoc.createElement('style');
+                        shadowStyle.textContent = `
+                            *, *::before, *::after {
+                                box-shadow: none !important;
+                                filter: none !important;
+                                text-shadow: none !important;
+                            }
+                        `;
+                        clonedDoc.head.appendChild(shadowStyle);
                     } catch (cloneError) {
-                        console.warn('Clone处理出现警告:', cloneError);
                         // 不抛出错误，继续截图过程
                     }
                 }
             });
 
-            console.log('截图成功！');
             return canvas;
 
         } catch (error) {
-            console.error('html2canvas错误详情:', error);
-
             // 如果是常见的html2canvas错误，尝试简化的备用方案
             if (error.message.includes('Unable to find element') ||
                 error.message.includes('createPattern') ||
                 error.message.includes('canvas element with a width or height of 0') ||
                 error.message.includes('cloned iframe')) {
-                console.log('检测到html2canvas兼容性问题，尝试简化的备用方案...');
 
                 try {
                     // 简化的备用方案：使用最基本的配置重试
@@ -1798,26 +1803,33 @@
                                    element.classList.contains('modal-overlay') ||
                                    element.tagName === 'SCRIPT' ||
                                    element.tagName === 'STYLE';
+                        },
+                        onclone: function(clonedDoc, element) {
+                            try {
+                                // 移除所有阴影效果
+                                const shadowStyle = clonedDoc.createElement('style');
+                                shadowStyle.textContent = `
+                                    *, *::before, *::after {
+                                        box-shadow: none !important;
+                                        filter: none !important;
+                                        text-shadow: none !important;
+                                    }
+                                `;
+                                clonedDoc.head.appendChild(shadowStyle);
+                            } catch (e) {
+                                // 忽略阴影移除失败
+                            }
                         }
                     });
 
-                    console.log('简化备用方案成功！');
                     return backupCanvas;
 
                 } catch (backupError) {
-                    console.error('备用方案也失败了:', backupError);
 
-                    // 提供用户友好的错误信息和解决建议
-                    throw new Error(`截图功能暂时不可用。建议解决方案：
-1. 刷新页面后重试
-2. 使用浏览器的打印功能（Ctrl+P）保存为PDF
-3. 使用浏览器的开发者工具手动截图
-
-技术详情：${backupError.message}`);
+                    throw new Error(`截图功能暂时不可用。技术详情：${backupError.message}`);
                 }
             }
 
-            // 提供更具体的错误信息
             if (error.message.includes('SecurityError')) {
                 throw new Error('截图失败：页面包含跨域内容，请确保所有资源都来自同一域名');
             } else if (error.message.includes('timeout')) {
@@ -1870,7 +1882,6 @@
             }
 
         } catch (error) {
-            console.error('截图操作失败:', error);
             showReportFeedbackMessage(`截图失败: ${error.message}`, 'error', 5000);
         } finally {
             this.innerHTML = originalButtonText;
@@ -1919,16 +1930,11 @@
             // 添加到DOM，触发下载，然后移除
             document.body.appendChild(link);
             link.click();
-
-            // 延迟移除链接，确保下载开始
-            setTimeout(() => {
-                document.body.removeChild(link);
-            }, 100);
+            document.body.removeChild(link);
 
             showReportFeedbackMessage(`✅ 截图已下载: ${filename}`, 'success');
 
         } catch (error) {
-            console.error('截图下载失败:', error);
             showReportFeedbackMessage(`截图下载失败: ${error.message}`, 'error', 5000);
         } finally {
             this.innerHTML = originalButtonText;
@@ -1943,7 +1949,6 @@
             await navigator.clipboard.writeText(htmlContent);
             showReportFeedbackMessage('HTML源码已拷贝到剪贴板!', 'success');
         } catch (error) {
-            console.error('拷贝HTML失败:', error);
             showReportFeedbackMessage('拷贝HTML失败: ' + error.message, 'error');
         }
     });
@@ -1969,7 +1974,6 @@
 
             showReportFeedbackMessage(`HTML报告已下载: ${filename}`, 'success');
         } catch (error) {
-            console.error('下载HTML失败:', error);
             showReportFeedbackMessage('下载HTML失败: ' + error.message, 'error');
         }
     });
