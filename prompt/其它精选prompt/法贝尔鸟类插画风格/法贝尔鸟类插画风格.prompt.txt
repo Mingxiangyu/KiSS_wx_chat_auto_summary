@@ -1,10 +1,11 @@
-任务：根据提供的微信群聊天记录（txt格式）生成群消息总结，输出为风格固定、一致的HTML页面，适合截图分享
+请详细总结群聊记录并生成md格式的群聊总结（提炼、找到关键的信息和详细描述），生成一个视觉上引人入胜、布局紧凑无空隙、配色和谐统一、风格固定一致、适合截图分享的单页网站
 
 ## 自动提取信息
 系统将自动从您提供的聊天记录中提取以下信息：
 - 群名称：将从聊天记录的系统通知或常见群聊信息中提取
 - 日期范围：根据记录中的所有日期自动生成（格式：YYYY-MM-DD ~ YYYY-MM-DD）
 - 时间范围：根据记录中的首条和末条消息时间确定
+- 昵称：昵称不需要显示账号
 
 ## 日报模式选择
 - 日报模式：[完整版/简化版] (默认为完整版)
@@ -38,6 +39,8 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
     <meta charset="UTF-8">
     <title>[群名称]日报 - [日期]</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
         /* 达芬奇风格的CSS样式 */
         :root {
@@ -83,9 +86,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23594a32' fill-opacity='0.07' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 5v1H5z'/%3E%3Cpath d='M6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23594a32' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 5v1H5z'/%3E%3Cpath d='M6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
             pointer-events: none;
             z-index: -1;
+            /* 降低背景图案透明度，减少视觉干扰 */
         }
 
         header {
@@ -152,6 +156,7 @@
             color: var(--ink-secondary);
             margin-bottom: 20px;
             font-style: italic;
+            text-align: center; /* 明确设置居中对齐，覆盖p标签的justify设置 */
         }
 
         .meta-info {
@@ -708,6 +713,286 @@
             color: var(--accent-gold);
         }
 
+        /* 核心概念关系图样式 - 达芬奇风格 */
+        .mindmap-section {
+            background-color: var(--parchment-dark);
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 1px solid var(--ink-secondary);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23785c38' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .mindmap-section::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid rgba(95, 75, 50, 0.2);
+            pointer-events: none;
+        }
+
+        /* 思维导图说明文字 */
+        .mindmap-description {
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--ink-secondary);
+            font-style: italic;
+            font-size: 16px;
+            padding: 15px;
+            background-color: rgba(95, 75, 50, 0.05);
+            border: 1px solid rgba(95, 75, 50, 0.2);
+        }
+
+
+
+        .mindmap-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mindmap-controls button {
+            background-color: var(--accent-blue);
+            color: var(--parchment);
+            border: 1px solid var(--ink-secondary);
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+            position: relative;
+        }
+
+        .mindmap-controls button:hover {
+            background-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .mindmap-controls .fullscreen-toggle-btn {
+            background-color: var(--accent-gold);
+        }
+
+        .mindmap-controls #resetZoomBtn {
+            background-color: var(--accent-green);
+        }
+
+        .mermaid-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            background-color: var(--parchment);
+            border: 3px double var(--ink-secondary);
+            padding: 30px;
+            min-height: 450px;
+            cursor: grab;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(95, 75, 50, 0.1);
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23785c38' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .mermaid-container.dragging {
+            cursor: grabbing;
+        }
+
+        .mermaid-container:empty::before {
+            content: "✨ 思维导图将在此处显示，展现讨论主题的层次结构和关联关系";
+            color: var(--ink-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 40px;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        .mermaid-container svg {
+            max-width: none;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease-out;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Mermaid反馈消息 */
+        #mermaid-main-feedback-message, #mermaid-modal-feedback-message {
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            font-weight: 500;
+            font-size: 16px;
+            display: none;
+            border: 1px solid var(--ink-secondary);
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+        }
+
+        #mermaid-main-feedback-message.success, #mermaid-modal-feedback-message.success {
+            color: var(--accent-green);
+            background-color: rgba(99, 114, 81, 0.1);
+            display: block;
+        }
+
+        #mermaid-main-feedback-message.error, #mermaid-modal-feedback-message.error {
+            color: var(--accent-red);
+            background-color: rgba(155, 46, 46, 0.1);
+            display: block;
+        }
+
+        #mermaid-main-feedback-message.info, #mermaid-modal-feedback-message.info {
+            color: var(--accent-blue);
+            background-color: rgba(78, 93, 114, 0.1);
+            display: block;
+        }
+
+        /* 全屏模态框样式 - 达芬奇风格 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(60, 36, 21, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 95%;
+            height: 90%;
+            max-width: 1200px;
+            background-color: var(--parchment-dark);
+            border: 3px double var(--ink-secondary);
+            padding: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2.2rem;
+            color: var(--ink-secondary);
+            cursor: pointer;
+            line-height: 1;
+            padding: 5px;
+            z-index: 1010;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--accent-red);
+        }
+
+        #modalMermaidContainer {
+            flex-grow: 1;
+            min-height: 0;
+        }
+
+        #modalMermaidContainer:empty::before {
+            content: "导图内容将在此显示。";
+            color: var(--ink-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+        }
+
+        /* 操作按钮样式 - 达芬奇风格 */
+        .action-buttons-container {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background-color: var(--parchment-dark);
+            border: 1px solid var(--ink-secondary);
+            position: relative;
+        }
+
+        .action-buttons-container::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid rgba(95, 75, 50, 0.2);
+            pointer-events: none;
+        }
+
+        .action-button {
+            background-color: var(--accent-blue);
+            color: var(--parchment);
+            border: 1px solid var(--ink-secondary);
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: normal;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px 12px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .action-button:hover {
+            background-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-button i, .action-button .fas {
+            margin-right: 8px;
+        }
+
+        #feedback-message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+            font-size: 18px;
+        }
+
+        #feedback-message.success {
+            color: var(--accent-green);
+        }
+
+        #feedback-message.error {
+            color: var(--accent-red);
+        }
+
         /* 响应式调整 */
         @media (max-width: 1200px) {
             body {
@@ -718,6 +1003,39 @@
             .cloud-wordcloud {
                 width: 90%;
                 height: 350px;
+            }
+
+            .mindmap-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .mindmap-controls button {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .modal-content {
+                width: 100%;
+                height: 95%;
+                padding: 20px;
+            }
+
+            .modal-close-btn {
+                font-size: 1.8rem;
+                top: 10px;
+                right: 10px;
+            }
+
+            .action-buttons-container {
+                padding: 20px;
+            }
+
+            .action-button {
+                display: block;
+                width: 80%;
+                margin: 8px auto;
+                max-width: 300px;
             }
         }
     </style>
@@ -786,7 +1104,53 @@
         </div>
     </section>
 
-    <!-- 3. 重要消息汇总 -->
+    <!-- 3. 核心概念关系图 -->
+    <section class="mindmap-section">
+        <h2>核心概念关系图</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+
+        <!-- 思维导图说明 -->
+        <div class="mindmap-description">
+            📝 展示讨论主题之间的关联关系。支持缩放查看、全屏模式和导出功能。
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="mindmap-controls">
+            <button id="zoomInBtn">🔍+ 放大</button>
+            <button id="zoomOutBtn">🔍- 缩小</button>
+            <button id="resetZoomBtn">🔄 重置缩放</button>
+            <button id="downloadDiagramBtn">📥 下载导图</button>
+            <button id="fullscreenOpenBtn" class="fullscreen-toggle-btn">⛶ 全屏</button>
+        </div>
+
+        <!-- 思维导图容器 -->
+        <div class="mermaid-container" id="mainMermaidContainer">
+            <div class="mermaid" id="mindmapDiagram">
+                mindmap
+                  root((今日讨论核心))
+                    技术分享
+                      AI工具
+                        ChatGPT应用
+                        代码生成
+                      开发技巧
+                        最佳实践
+                        性能优化
+                    问题解答
+                      技术难题
+                        解决方案
+                        经验分享
+                      学习资源
+                        教程推荐
+                        书籍分享
+                    日常交流
+                      工作心得
+                      生活分享
+            </div>
+        </div>
+        <div id="mermaid-main-feedback-message"></div>
+    </section>
+
+    <!-- 4. 重要消息汇总 -->
     <section class="important-messages">
         <h2>重要消息汇总</h2>
         <div class="davinci-ornament">✦ ✦ ✦</div>
@@ -808,7 +1172,7 @@
         </div>
     </section>
 
-    <!-- 4. 有趣对话或金句 -->
+    <!-- 5. 有趣对话或金句 -->
     <section class="interesting-dialogues">
         <h2>有趣对话或金句</h2>
         <div class="davinci-ornament">✦ ✦ ✦</div>
@@ -840,7 +1204,7 @@
         </div>
     </section>
 
-    <!-- 5. 问题与解答 -->
+    <!-- 6. 问题与解答 -->
     <section class="questions-answers">
         <h2>问题与解答</h2>
         <div class="davinci-ornament">✦ ✦ ✦</div>
@@ -875,7 +1239,7 @@
         </div>
     </section>
 
-    <!-- 6. 群内数据可视化 -->
+    <!-- 7. 群内数据可视化 -->
     <section class="analytics">
         <h2>群内数据可视化</h2>
         <div class="davinci-ornament">✦ ✦ ✦</div>
@@ -946,7 +1310,7 @@
         </div>
     </section>
 
-    <!-- 7. 词云 -->
+    <!-- 8. 词云 -->
     <section class="word-cloud">
         <h2>热门词云</h2>
         <div class="davinci-ornament">✦ ✦ ✦</div>
@@ -985,7 +1349,33 @@
         </div>
     </section>
 
-    <!-- 8. 页面底部 -->
+    <!-- 操作按钮 -->
+    <div class="action-buttons-container">
+        <button id="screenshotToClipboardBtn" class="action-button">📋 拷贝截图</button>
+        <button id="screenshotDownloadBtn" class="action-button">📷 下载截图</button>
+        <button id="copyHtmlBtn" class="action-button">📄 拷贝源码</button>
+        <button id="downloadHtmlBtn" class="action-button">💾 下载报告</button>
+    </div>
+    <div id="feedback-message"></div>
+
+    <!-- 全屏模态框 -->
+    <div id="fullscreenModal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="fullscreenCloseBtn" class="modal-close-btn" aria-label="关闭全屏">&times;</button>
+            <h2>核心概念关系图 (全屏)</h2>
+            <div class="davinci-ornament">✦ ✦ ✦</div>
+            <div class="mindmap-controls">
+                <button id="modalZoomInBtn">🔍+ 放大</button>
+                <button id="modalZoomOutBtn">🔍- 缩小</button>
+                <button id="modalDownloadDiagramBtn">📥 下载导图</button>
+            </div>
+            <div class="mermaid-container" id="modalMermaidContainer">
+            </div>
+            <div id="mermaid-modal-feedback-message"></div>
+        </div>
+    </div>
+
+    <!-- 9. 页面底部 -->
     <footer>
         <p>数据来源：[群名称]聊天记录</p>
         <p>生成时间：<span class="generation-time">[当前时间]</span></p>
@@ -993,6 +1383,559 @@
         <p class="disclaimer">免责声明：本报告内容基于群聊公开讨论，如有不当内容或侵权问题请联系管理员处理。</p>
     </footer>
 
+    <script>
+    // --- Mermaid Diagram JavaScript START ---
+    // --- Global Variables for Mermaid ---
+    let mainCurrentScale = 1;
+    let modalCurrentScale = 1;
+    let currentMindmapDefinition = ''; // Store the current definition
+
+    // --- DOM Elements for Mermaid ---
+    const mainZoomInBtn = document.getElementById('zoomInBtn');
+    const mainZoomOutBtn = document.getElementById('zoomOutBtn');
+    const resetZoomBtn = document.getElementById('resetZoomBtn');
+    const mainDownloadDiagramBtn = document.getElementById('downloadDiagramBtn');
+    const mainMermaidContainer = document.getElementById('mainMermaidContainer');
+    const mermaidMainFeedbackMessage = document.getElementById('mermaid-main-feedback-message');
+    const mainMindmapDiagramDiv = document.getElementById('mindmapDiagram');
+
+
+
+    const fullscreenOpenBtn = document.getElementById('fullscreenOpenBtn');
+    const fullscreenModal = document.getElementById('fullscreenModal');
+    const fullscreenCloseBtn = document.getElementById('fullscreenCloseBtn');
+    const modalMermaidContainer = document.getElementById('modalMermaidContainer');
+    const modalZoomInBtn = document.getElementById('modalZoomInBtn');
+    const modalZoomOutBtn = document.getElementById('modalZoomOutBtn');
+    const modalDownloadDiagramBtn = document.getElementById('modalDownloadDiagramBtn');
+    const mermaidModalFeedbackMessage = document.getElementById('mermaid-modal-feedback-message');
+
+    // --- Mermaid Initialization ---
+    if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            fontFamily: '"Cormorant Garamond", "STKaiti", "KaiTi", serif',
+            mindmap: { padding: 15 }
+        });
+    } else {
+        console.error("Mermaid library not loaded.");
+        if(mermaidMainFeedbackMessage) mermaidMainFeedbackMessage.textContent = "错误：Mermaid库未能加载。";
+    }
+
+    // --- Helper Functions for Mermaid ---
+    function showMermaidFeedback(element, message, type = 'info', duration = 3000) {
+        if (element) {
+            element.textContent = message;
+            element.className = type;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = '';
+                element.style.display = 'none';
+            }, duration);
+        }
+    }
+
+    function applySvgScale(svgElement, scale) {
+        if (svgElement) {
+            svgElement.style.transform = `scale(${scale})`;
+            svgElement.style.transformOrigin = 'center center';
+        }
+    }
+
+    function makeDraggable(containerElement) {
+        let isDragging = false;
+        let startX, startY, scrollLeftStart, scrollTopStart;
+
+        if (!containerElement) return;
+
+        containerElement.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('[onclick]')) return;
+
+            if (e.target === containerElement) {
+                const verticalScrollbarVisible = containerElement.scrollHeight > containerElement.clientHeight;
+                const horizontalScrollbarVisible = containerElement.scrollWidth > containerElement.clientWidth;
+                const clickedOnVerticalScrollbar = verticalScrollbarVisible && e.offsetX >= containerElement.clientWidth - 17;
+                const clickedOnHorizontalScrollbar = horizontalScrollbarVisible && e.offsetY >= containerElement.clientHeight - 17;
+                if (clickedOnVerticalScrollbar || clickedOnHorizontalScrollbar) return;
+            }
+
+            isDragging = true;
+            startX = e.pageX; startY = e.pageY;
+            scrollLeftStart = containerElement.scrollLeft; scrollTopStart = containerElement.scrollTop;
+            containerElement.classList.add('dragging');
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const deltaX = e.pageX - startX; const deltaY = e.pageY - startY;
+            containerElement.scrollLeft = scrollLeftStart - deltaX;
+            containerElement.scrollTop = scrollTopStart - deltaY;
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (e.button !== 0 || !isDragging) return;
+            isDragging = false;
+            containerElement.classList.remove('dragging');
+        });
+
+        containerElement.addEventListener('touchstart', (e) => {
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('[onclick]')) return;
+            if (e.touches.length === 1) {
+                isDragging = true;
+                const touch = e.touches[0];
+                startX = touch.pageX;
+                startY = touch.pageY;
+                scrollLeftStart = containerElement.scrollLeft;
+                scrollTopStart = containerElement.scrollTop;
+                containerElement.classList.add('dragging');
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            const touch = e.touches[0];
+            const deltaX = touch.pageX - startX;
+            const deltaY = touch.pageY - startY;
+            containerElement.scrollLeft = scrollLeftStart - deltaX;
+            containerElement.scrollTop = scrollTopStart - deltaY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            containerElement.classList.remove('dragging');
+        });
+    }
+
+    async function downloadMermaidAsSVG(svgElement, baseFilename, feedbackElem) {
+        if (svgElement && svgElement.innerHTML.trim() !== "") {
+            try {
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${baseFilename}.svg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showMermaidFeedback(feedbackElem, `${baseFilename}.svg 已下载!`, 'success');
+            } catch (error) {
+                console.error(`Error during SVG download for ${baseFilename}:`, error);
+                showMermaidFeedback(feedbackElem, `下载 ${baseFilename}.svg 失败: ${error.message}`, 'error');
+            }
+        } else {
+            showMermaidFeedback(feedbackElem, '无法下载：图表内容为空。', 'error');
+        }
+    }
+
+    async function renderDiagram(definition, targetContainer, scaleVariableRef, feedbackElem, uniqueSvgId) {
+        if (!targetContainer) {
+            console.error("Target container for Mermaid diagram not found.");
+            return null;
+        }
+        targetContainer.innerHTML = '<p style="text-align:center; padding:20px; font-family: \'Cormorant Garamond\', \'STKaiti\', \'KaiTi\', serif; font-style: italic; color: var(--ink-secondary);">图表加载中...</p>';
+        targetContainer.classList.remove('empty');
+
+        if (!definition || definition.trim() === "" || definition.trim().toLowerCase() === "mindmap") {
+            targetContainer.innerHTML = '';
+            targetContainer.classList.add('empty');
+            return null;
+        }
+
+        currentMindmapDefinition = definition;
+
+        try {
+            if (typeof mermaid === 'undefined') throw new Error("Mermaid library is not available.");
+            const {svg, bindFunctions} = await mermaid.render(uniqueSvgId, definition);
+            targetContainer.innerHTML = svg;
+            if (bindFunctions) bindFunctions(targetContainer);
+
+            const svgElement = targetContainer.querySelector('svg');
+            if (svgElement) {
+                if (targetContainer === mainMermaidContainer) mainCurrentScale = 1;
+                else if (targetContainer === modalMermaidContainer) modalCurrentScale = 1;
+
+                applySvgScale(svgElement, scaleVariableRef.value);
+                makeDraggable(targetContainer);
+                return svgElement;
+            } else {
+                targetContainer.innerHTML = '';
+                targetContainer.classList.add('empty');
+                showMermaidFeedback(feedbackElem, '图表生成了，但未找到SVG内容。', 'error');
+                return null;
+            }
+        } catch (error) {
+            console.error("Error rendering Mermaid:", error);
+            targetContainer.innerHTML = `<p style="color: var(--accent-red); text-align:center; padding:20px; font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif; font-style: italic;">渲染图表时出错: ${error.message}</p>`;
+            showMermaidFeedback(feedbackElem, `渲染图表时出错: ${error.message}`, 'error', 5000);
+            return null;
+        }
+    }
+
+
+
+
+
+    // --- Main Mindmap Logic ---
+    if(mainZoomInBtn) mainZoomInBtn.addEventListener('click', () => {
+        mainCurrentScale += 0.1;
+        const svg = mainMermaidContainer.querySelector('svg');
+        applySvgScale(svg, mainCurrentScale);
+        showMermaidFeedback(mermaidMainFeedbackMessage, `缩放: ${Math.round(mainCurrentScale * 100)}%`, 'info', 1000);
+    });
+
+    if(mainZoomOutBtn) mainZoomOutBtn.addEventListener('click', () => {
+        if (mainCurrentScale > 0.2) {
+            mainCurrentScale -= 0.1;
+            const svg = mainMermaidContainer.querySelector('svg');
+            applySvgScale(svg, mainCurrentScale);
+            showMermaidFeedback(mermaidMainFeedbackMessage, `缩放: ${Math.round(mainCurrentScale * 100)}%`, 'info', 1000);
+        }
+    });
+
+    if(resetZoomBtn) resetZoomBtn.addEventListener('click', () => {
+        mainCurrentScale = 1;
+        const svg = mainMermaidContainer.querySelector('svg');
+        applySvgScale(svg, mainCurrentScale);
+        showMermaidFeedback(mermaidMainFeedbackMessage, '缩放已重置为100%', 'success', 1500);
+    });
+
+    if(mainDownloadDiagramBtn) mainDownloadDiagramBtn.addEventListener('click', () => {
+        const svg = mainMermaidContainer.querySelector('svg');
+        downloadMermaidAsSVG(svg, '核心概念关系图', mermaidMainFeedbackMessage);
+    });
+
+
+
+    // --- Fullscreen Modal Logic for Mermaid ---
+    if(fullscreenOpenBtn) fullscreenOpenBtn.addEventListener('click', async () => {
+        if (!currentMindmapDefinition || currentMindmapDefinition.trim() === "" || currentMindmapDefinition.trim().toLowerCase() === "mindmap") {
+             showMermaidFeedback(mermaidMainFeedbackMessage, '请先生成一个有效的导图才能全屏查看。', 'info');
+             return;
+        }
+        if(fullscreenModal) fullscreenModal.classList.add('active');
+        document.body.classList.add('modal-active');
+        modalCurrentScale = mainCurrentScale;
+        await renderDiagram(currentMindmapDefinition, modalMermaidContainer, {value: modalCurrentScale}, mermaidModalFeedbackMessage, 'modalGeneratedSvgId');
+    });
+
+    if(fullscreenCloseBtn) fullscreenCloseBtn.addEventListener('click', () => {
+        if(fullscreenModal) fullscreenModal.classList.remove('active');
+        document.body.classList.remove('modal-active');
+        if(modalMermaidContainer) {
+            modalMermaidContainer.innerHTML = '';
+            modalMermaidContainer.classList.add('empty');
+        }
+    });
+
+    if(modalZoomInBtn) modalZoomInBtn.addEventListener('click', () => {
+        modalCurrentScale += 0.1;
+        const svg = modalMermaidContainer.querySelector('svg');
+        applySvgScale(svg, modalCurrentScale);
+    });
+
+    if(modalZoomOutBtn) modalZoomOutBtn.addEventListener('click', () => {
+        if (modalCurrentScale > 0.2) {
+            modalCurrentScale -= 0.1;
+            const svg = modalMermaidContainer.querySelector('svg');
+            applySvgScale(svg, modalCurrentScale);
+        }
+    });
+
+    if(modalDownloadDiagramBtn) modalDownloadDiagramBtn.addEventListener('click', () => {
+        const svg = modalMermaidContainer.querySelector('svg');
+        downloadMermaidAsSVG(svg, '核心概念关系图-全屏', mermaidModalFeedbackMessage);
+    });
+
+    // --- 初始化思维导图 ---
+    async function initializeMainDiagram() {
+        if (mainMindmapDiagramDiv && mainMermaidContainer) {
+            const initialDefinition = mainMindmapDiagramDiv.textContent.trim();
+            if (initialDefinition) {
+                await renderDiagram(initialDefinition, mainMermaidContainer, { value: mainCurrentScale }, mermaidMainFeedbackMessage, 'initialMainDiagramSvg');
+            } else {
+                mainMermaidContainer.classList.add('empty');
+            }
+        } else {
+             if(mermaidMainFeedbackMessage && !mainMermaidContainer) showMermaidFeedback(mermaidMainFeedbackMessage, '错误：导图容器未找到。', 'error');
+        }
+    }
+    // --- Mermaid Diagram JavaScript END ---
+
+    // --- Report Page JavaScript START ---
+    function getWebpageNameForFilename() {
+        const pageTitleTag = document.querySelector('title');
+        let baseName = 'AI产品日报';
+        if (pageTitleTag && pageTitleTag.textContent) {
+            const fullTitle = pageTitleTag.textContent.trim();
+            const titleParts = fullTitle.split(' - ');
+            if (titleParts.length > 0 && titleParts[0].trim() !== "" && titleParts[0].trim() !== "[群名称]日报") {
+                baseName = titleParts[0].trim();
+            }
+        }
+        return baseName;
+    }
+
+    function getDateStringForFilename() {
+        const reportDateElement = document.querySelector('.date');
+        let dateStr = "未指定日期";
+        if (reportDateElement && reportDateElement.textContent) {
+            const dateContent = reportDateElement.textContent.trim();
+            if (dateContent && dateContent !== "[日期范围]") {
+                dateStr = dateContent;
+            }
+        }
+        return dateStr;
+    }
+
+    function sanitizeFilename(filename) {
+        return filename.replace(/[^a-z0-9\u4e00-\u9fa5_\-\.\(\)\[\]]/gi, '_').replace(/_+/g, '_');
+    }
+
+    function showReportFeedbackMessage(message, type = 'info', duration = 3000) {
+        const feedbackElement = document.getElementById('feedback-message');
+        if (feedbackElement) {
+            feedbackElement.textContent = message;
+            feedbackElement.className = type;
+            setTimeout(() => {
+                feedbackElement.textContent = '';
+                feedbackElement.className = '';
+            }, duration);
+        }
+    }
+
+    async function captureScreenshot(elementToCapture) {
+        // 检查html2canvas是否可用
+        if (typeof html2canvas === 'undefined') {
+            throw new Error('html2canvas库未正确加载，请刷新页面重试');
+        }
+
+        try {
+            await document.fonts.ready;
+
+            // 简化配置，提高兼容性
+            const canvas = await html2canvas(elementToCapture, {
+                useCORS: true,
+                scale: window.devicePixelRatio || 1,
+                logging: false,
+                backgroundColor: '#f2e8c9',
+                allowTaint: false,
+                foreignObjectRendering: false,
+                imageTimeout: 15000,
+                removeContainer: true,
+                onclone: function(clonedDoc, element) {
+                    try {
+                        // 隐藏操作按钮和反馈消息
+                        const actionButtons = clonedDoc.querySelector('.action-buttons-container');
+                        const feedbackMsg = clonedDoc.querySelector('#feedback-message');
+                        const modalOverlay = clonedDoc.querySelector('.modal-overlay');
+
+                        if (actionButtons) actionButtons.style.display = 'none';
+                        if (feedbackMsg) feedbackMsg.style.display = 'none';
+                        if (modalOverlay) modalOverlay.style.display = 'none';
+
+                        // 确保body样式正确
+                        const clonedBody = clonedDoc.body;
+                        if (clonedBody) {
+                            clonedBody.style.transform = 'none';
+                            clonedBody.style.overflow = 'visible';
+                            clonedBody.style.position = 'static';
+                        }
+
+                        // 处理可能导致问题的SVG元素
+                        const svgElements = clonedDoc.querySelectorAll('svg');
+                        svgElements.forEach(svg => {
+                            svg.style.overflow = 'visible';
+                        });
+
+                    } catch (cloneError) {
+                        console.warn('Clone处理出现警告:', cloneError);
+                        // 不抛出错误，继续截图过程
+                    }
+                }
+            });
+
+            return canvas;
+
+        } catch (error) {
+            console.error('html2canvas错误详情:', error);
+            // 提供更具体的错误信息
+            if (error.message.includes('SecurityError')) {
+                throw new Error('截图失败：页面包含跨域内容，请确保所有资源都来自同一域名');
+            } else if (error.message.includes('timeout')) {
+                throw new Error('截图失败：处理超时，页面内容过于复杂');
+            } else {
+                throw new Error(`截图失败：${error.message || '未知错误，请尝试刷新页面后重试'}`);
+            }
+        }
+    }
+
+    const screenshotToClipboardBtn = document.getElementById('screenshotToClipboardBtn');
+    if(screenshotToClipboardBtn) screenshotToClipboardBtn.addEventListener('click', async function() {
+        const reportContent = document.body;
+        if (!reportContent) {
+            showReportFeedbackMessage('截图错误: 未找到报告内容。', 'error');
+            return;
+        }
+
+        const originalButtonText = this.innerHTML;
+        this.innerHTML = '⏳ 处理中...';
+        this.disabled = true;
+
+        try {
+            showReportFeedbackMessage('正在生成截图，请稍候...', 'info');
+
+            const canvas = await captureScreenshot(reportContent);
+
+            if (!canvas) {
+                throw new Error('截图生成失败，canvas为空');
+            }
+
+            // 使用Promise包装toBlob以便更好地处理错误
+            const blob = await new Promise((resolve, reject) => {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('无法将Canvas转换为Blob'));
+                    }
+                }, 'image/png', 0.95);
+            });
+
+            if (navigator.clipboard && navigator.clipboard.write) {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                showReportFeedbackMessage('✅ 截图已拷贝到剪贴板!', 'success');
+            } else {
+                showReportFeedbackMessage('截图已生成，但您的浏览器不支持直接拷贝图片。请尝试下载截图。', 'error', 5000);
+            }
+
+        } catch (error) {
+            console.error('截图操作失败:', error);
+            showReportFeedbackMessage(`截图失败: ${error.message}`, 'error', 5000);
+        } finally {
+            this.innerHTML = originalButtonText;
+            this.disabled = false;
+        }
+    });
+
+    const screenshotDownloadBtn = document.getElementById('screenshotDownloadBtn');
+    if(screenshotDownloadBtn) screenshotDownloadBtn.addEventListener('click', async function() {
+        const reportContent = document.body;
+        if (!reportContent) {
+            showReportFeedbackMessage('截图错误: 未找到报告内容。', 'error');
+            return;
+        }
+
+        const originalButtonText = this.innerHTML;
+        this.innerHTML = '⏳ 生成中...';
+        this.disabled = true;
+
+        try {
+            showReportFeedbackMessage('正在生成截图，请稍候...', 'info');
+
+            const canvas = await captureScreenshot(reportContent);
+
+            if (!canvas) {
+                throw new Error('截图生成失败，canvas为空');
+            }
+
+            // 使用toDataURL生成图片数据
+            const imageData = canvas.toDataURL('image/png', 0.95);
+
+            if (!imageData || imageData === 'data:,') {
+                throw new Error('无法生成图片数据');
+            }
+
+            // 创建下载链接
+            const link = document.createElement('a');
+            const webpageName = getWebpageNameForFilename();
+            const dateStr = getDateStringForFilename();
+            const filename = sanitizeFilename(`${webpageName}_${dateStr}_截图.png`);
+
+            link.href = imageData;
+            link.download = filename;
+            link.style.display = 'none';
+
+            // 添加到DOM，触发下载，然后移除
+            document.body.appendChild(link);
+            link.click();
+
+            // 延迟移除链接，确保下载开始
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+
+            showReportFeedbackMessage(`✅ 截图已下载: ${filename}`, 'success');
+
+        } catch (error) {
+            console.error('截图下载失败:', error);
+            showReportFeedbackMessage(`截图下载失败: ${error.message}`, 'error', 5000);
+        } finally {
+            this.innerHTML = originalButtonText;
+            this.disabled = false;
+        }
+    });
+
+    const copyHtmlBtn = document.getElementById('copyHtmlBtn');
+    if(copyHtmlBtn) copyHtmlBtn.addEventListener('click', async function() {
+        try {
+            const htmlContent = document.documentElement.outerHTML;
+            await navigator.clipboard.writeText(htmlContent);
+            showReportFeedbackMessage('HTML源码已拷贝到剪贴板!', 'success');
+        } catch (error) {
+            console.error('拷贝HTML失败:', error);
+            showReportFeedbackMessage('拷贝HTML失败: ' + error.message, 'error');
+        }
+    });
+
+    const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+    if(downloadHtmlBtn) downloadHtmlBtn.addEventListener('click', function() {
+        try {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            const webpageName = getWebpageNameForFilename();
+            const dateStr = getDateStringForFilename();
+            const filename = sanitizeFilename(`${webpageName}_${dateStr}_报告.html`);
+
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showReportFeedbackMessage(`HTML报告已下载: ${filename}`, 'success');
+        } catch (error) {
+            console.error('下载HTML失败:', error);
+            showReportFeedbackMessage('下载HTML失败: ' + error.message, 'error');
+        }
+    });
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 检查依赖库是否加载
+        if (typeof mermaid === 'undefined') {
+            showReportFeedbackMessage('Mermaid库未正确加载，思维导图功能可能无法使用', 'error', 5000);
+        }
+        if (typeof html2canvas === 'undefined') {
+            showReportFeedbackMessage('html2canvas库未正确加载，截图功能可能无法使用', 'error', 5000);
+        }
+
+        // 初始化思维导图
+        initializeMainDiagram();
+    });
+    </script>
 
 </body></html>
 

@@ -1,31 +1,26 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta http-equiv="Content-Security-Policy"
-          content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
     <meta charset="UTF-8">
     <title>[群名称]日报 - [日期]</title>
-
-    <!--防止阻塞-->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <style>
-        /* 法贝尔鸟类插画风格的CSS样式 */
-        /*@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');*/
-
+        /* 达芬奇风格的CSS样式 */
         :root {
-            --bg-primary: #f5f2e9;
-            --bg-secondary: #f0ead6;
-            --bg-tertiary: #fff9e6;
-            --bg-card: #fffcf5;
-            --text-primary: #3c2f2f;
-            --text-secondary: #5d5149;
-            --accent-primary: #8b4513;
-            --accent-secondary: #a63a3a;
-            --accent-tertiary: #2c5545;
-            --accent-blue: #235789;
-            --accent-green: #606c38;
-            --accent-yellow: #d9a566;
+            --parchment: #f2e8c9;
+            --parchment-dark: #e8d7a9;
+            --ink-primary: #3c2415;
+            --ink-secondary: #5f4b32;
+            --accent-red: #9b2e2e;
+            --accent-gold: #b4924a;
+            --accent-blue: #4e5d72;
+            --accent-green: #637251;
+            --accent-sepia: #a6947c;
+        }
+
+        @font-face {
+            font-family: 'DaVinciScript';
+            src: url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
         }
 
         * {
@@ -35,79 +30,96 @@
         }
 
         body {
-            font-family: 'Libre Baskerville', Georgia, serif;
-            background-color: var(--bg-primary);
-            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23d1c9b7' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
-            color: var(--text-primary);
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            background-color: var(--parchment);
+            color: var(--ink-primary);
             line-height: 1.6;
-            font-size: 16px;
+            font-size: 18px;
             width: 1200px;
             margin: 0 auto;
             padding: 20px;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23785c38' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23594a32' fill-opacity='0.03' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 5v1H5z'/%3E%3Cpath d='M6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: -1;
+            /* 降低背景图案透明度，减少视觉干扰 */
         }
 
         header {
             text-align: center;
-            padding: 40px 0;
-            background-color: var(--bg-secondary);
-            margin-bottom: 40px;
-            border: 1px solid #e0d8c0;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            padding: 30px 0;
+            background-color: var(--parchment-dark);
+            margin-bottom: 30px;
+            border: 3px double var(--ink-secondary);
             position: relative;
-            overflow: hidden;
-            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20.5V18H0v-2h20v-2H0v-2h20v-2H0V8h20V6H0V4h20V2H0V0h22v20h2V0h2v20h2V0h2v20h2V0h2v20h2V0h2v20h2v2H20v-1.5zM0 20h2v20H0V20zm4 0h2v20H4V20zm4 0h2v20H8V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20zm4 0h2v20h-2V20z' fill='%23594a32' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
 
-        /* 添加鸟类装饰 */
-        header:before, header:after {
-            content: "";
+        header::before, header::after {
+            content: "❦";
+            font-size: 30px;
+            color: var(--accent-red);
+            display: inline-block;
             position: absolute;
-            width: 150px;
-            height: 120px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            opacity: 0.6;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
-        header:before {
-            top: 20px;
-            left: 20px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'%3E%3Cpath d='M190,50c-8.2-11.8-20.4-11.4-32.2-5.2c-3.6-12.8-12.4-19.2-24.6-17.6c-9.8-7.4-18-9-27,1.8c-5.6-5.2-10-3.8-15.4,1.4 c-4.8-1.2-7.2,1.4-7.2,6c-5,1.4-8.2,4.8-6.6,10.4c-5.6,2.6-6.2,6.8-3.6,12c-7.6,7.8-7.4,15.4-0.2,23.2c-1.2,4.8,0.8,8.2,5.6,9.6 c0.4,5.2,3.4,7.4,8.6,6.8c2.6,6.6,7.4,8.2,14,4.8c4.6,3.8,9,3.8,13.4-0.4c10.2,3.2,17.8-0.2,24.6-9.6c11.2,3.2,16-2.8,18.6-12.6 c7.2,0.2,10.8-3.8,11-11.2c5.4-0.4,6.8-4,6.8-9C181.4,55.2,185.6,50.4,190,50z' fill='%238b4513' fill-opacity='0.2'/%3E%3C/svg%3E");
+        header::before {
+            left: 30px;
         }
 
-        header:after {
-            bottom: 20px;
-            right: 20px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 160'%3E%3Cpath d='M10,50c8.2-11.8,20.4-11.4,32.2-5.2c3.6-12.8,12.4-19.2,24.6-17.6c9.8-7.4,18-9,27,1.8c5.6-5.2,10-3.8,15.4,1.4 c4.8-1.2,7.2,1.4,7.2,6c5,1.4,8.2,4.8,6.6,10.4c5.6,2.6,6.2,6.8,3.6,12c7.6,7.8,7.4,15.4,0.2,23.2c1.2,4.8-0.8,8.2-5.6,9.6 c-0.4,5.2-3.4,7.4-8.6,6.8c-2.6,6.6-7.4,8.2-14,4.8c-4.6,3.8-9,3.8-13.4-0.4c-10.2,3.2-17.8-0.2-24.6-9.6c-11.2,3.2-16-2.8-18.6-12.6 c-7.2,0.2-10.8-3.8-11-11.2c-5.4-0.4-6.8-4-6.8-9C18.6,55.2,14.4,50.4,10,50z' fill='%232c5545' fill-opacity='0.2'/%3E%3C/svg%3E");
+        header::after {
+            right: 30px;
         }
 
         h1 {
-            font-size: 42px;
-            font-weight: 700;
-            color: var(--accent-tertiary);
+            font-size: 46px;
+            font-weight: normal;
+            color: var(--accent-red);
             margin-bottom: 15px;
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            letter-spacing: 2px;
+            text-transform: uppercase;
             position: relative;
             display: inline-block;
         }
 
-        h1:after {
-            content: "";
-            display: block;
-            width: 80%;
-            height: 4px;
-            background-image: url("data:image/svg+xml,%3Csvg width='120' height='4' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,2 C30,4 60,0 90,2 C120,4 150,0 180,2 C210,4 240,0 270,2 C300,4 330,0 360,2' stroke='%238b4513' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-            background-repeat: repeat-x;
+        h1::before, h1::after {
+            content: "✦";
+            font-size: 24px;
+            color: var(--accent-gold);
+            display: inline-block;
             position: absolute;
-            bottom: -6px;
-            left: 10%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        h1::before {
+            left: -40px;
+        }
+
+        h1::after {
+            right: -40px;
         }
 
         .date {
-            font-size: 18px;
-            color: var(--text-secondary);
-            margin-bottom: 25px;
+            font-size: 22px;
+            color: var(--ink-secondary);
+            margin-bottom: 20px;
             font-style: italic;
+            text-align: center; /* 明确设置居中对齐，覆盖p标签的justify设置 */
         }
 
         .meta-info {
@@ -117,384 +129,336 @@
         }
 
         .meta-info span {
-            background-color: var(--bg-tertiary);
+            background-color: rgba(95, 75, 50, 0.1);
             padding: 5px 15px;
-            border-radius: 4px;
-            font-size: 14px;
-            border: 1px solid #e0d8c0;
+            border: 1px solid var(--ink-secondary);
+            font-size: 16px;
+            position: relative;
         }
 
         section {
-            background-color: var(--bg-secondary);
+            background-color: var(--parchment-dark);
             margin-bottom: 40px;
             padding: 30px;
-            border: 1px solid #e0d8c0;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--ink-secondary);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23785c38' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
 
-        /* 为每个部分添加特定的鸟类图标 */
-        section:before {
+        section::before {
             content: "";
-            width: 40px;
-            height: 40px;
-            background-size: contain;
-            background-repeat: no-repeat;
             position: absolute;
-            top: -20px;
-            left: 30px;
-            z-index: 1;
-        }
-
-        .hot-topics:before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50,10c-6,8-14,13-25,15c0,15,5,30,25,50c20-20,25-35,25-50C64,23,56,18,50,10z' fill='%23a63a3a'/%3E%3C/svg%3E");
-        }
-
-        .tutorials:before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,40c0,0,10-15,30-15c20,0,30,15,30,15s-10,15-30,15C30,55,20,40,20,40z M50,45c2.8,0,5-2.2,5-5c0-2.8-2.2-5-5-5c-2.8,0-5,2.2-5,5C45,42.8,47.2,45,50,45z' fill='%23235789'/%3E%3C/svg%3E");
-        }
-
-        .important-messages:before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M30,30c0,0,10,30,20,30c10,0,20-30,20-30s-10-10-20-10C40,20,30,30,30,30z M50,70c-3,0-5,2-5,5c0,3,2,5,5,5c3,0,5-2,5-5C55,72,53,70,50,70z' fill='%23d9a566'/%3E%3C/svg%3E");
-        }
-
-        .interesting-dialogues:before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M25,25c-5,5-5,15,0,20c5,5,15,5,20,0c5-5,5-15,0-20C40,20,30,20,25,25z M55,55c-5,5-5,15,0,20c5,5,15,5,20,0c5-5,5-15,0-20C70,50,60,50,55,55z' fill='%232c5545'/%3E%3C/svg%3E");
-        }
-
-        .questions-answers:before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,50c0-16.6,13.4-30,30-30c16.6,0,30,13.4,30,30c0,16.6-13.4,30-30,30C33.4,80,20,66.6,20,50z M44,45c0,3.3,2.7,6,6,6c3.3,0,6-2.7,6-6c0-3.3-2.7-6-6-6C46.7,39,44,41.7,44,45z' fill='%238b4513'/%3E%3C/svg%3E");
-        }
-
-        .analytics:before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,80h60v-10h-60V80z M20,60h40v-10h-40V60z M20,40h20v-10h-20V40z' fill='%23606c38'/%3E%3C/svg%3E");
-        }
-
-        .word-cloud:before {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M25,60c0-8.3,6.7-15,15-15c8.3,0,15,6.7,15,15c0,8.3-6.7,15-15,15C31.7,75,25,68.3,25,60z M60,45c0-5.5,4.5-10,10-10c5.5,0,10,4.5,10,10c0,5.5-4.5,10-10,10C64.5,55,60,50.5,60,45z M15,40c0-4.4,3.6-8,8-8c4.4,0,8,3.6,8,8c0,4.4-3.6,8-8,8C18.6,48,15,44.4,15,40z' fill='%23235789'/%3E%3C/svg%3E");
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid rgba(95, 75, 50, 0.2);
+            pointer-events: none;
         }
 
         h2 {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--accent-tertiary);
+            font-size: 32px;
+            font-weight: normal;
+            color: var(--accent-blue);
             margin-bottom: 25px;
-            padding-bottom: 10px;
-            border-bottom: 3px double #d1c9b7;
-            font-family: 'Cormorant Garamond', serif;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent-blue);
+            text-align: center;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
             position: relative;
         }
 
-        h2:after {
-            content: "";
+        h2::before, h2::after {
+            content: "✧";
+            font-size: 20px;
+            color: var(--accent-gold);
+            display: inline-block;
             position: absolute;
-            bottom: -3px;
+            top: 50%;
+            transform: translateY(-70%);
+        }
+
+        h2::before {
             left: 0;
-            width: 60px;
-            height: 3px;
-            background-color: var(--accent-tertiary);
+        }
+
+        h2::after {
+            right: 0;
         }
 
         h3 {
-            font-size: 22px;
-            font-weight: 600;
-            color: var(--accent-primary);
+            font-size: 26px;
+            font-weight: normal;
+            color: var(--accent-gold);
             margin: 20px 0 15px 0;
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            text-align: center;
             position: relative;
-            display: inline-block;
+            padding-bottom: 10px;
         }
 
-        h3:after {
+        h3::after {
             content: "";
-            display: block;
-            width: 100%;
-            height: 2px;
-            background-image: url("data:image/svg+xml,%3Csvg width='120' height='2' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,1 C30,2 60,0 90,1 C120,2 150,0 180,1' stroke='%238b4513' stroke-width='1' fill='none' stroke-dasharray='1,3'/%3E%3C/svg%3E");
-            background-repeat: repeat-x;
             position: absolute;
-            bottom: -3px;
+            bottom: 0;
+            left: 25%;
+            right: 25%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--accent-gold), transparent);
         }
 
         h4 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--accent-secondary);
+            font-size: 22px;
+            font-weight: normal;
+            color: var(--accent-red);
             margin: 15px 0 10px 0;
-            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
         }
 
         p {
             margin-bottom: 15px;
             line-height: 1.7;
+            text-align: justify;
+            hyphens: auto;
         }
 
         ul, ol {
-            margin-left: 20px;
+            margin-left: 25px;
             margin-bottom: 20px;
-            list-style-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12'%3E%3Ccircle cx='6' cy='6' r='3' fill='%238b4513'/%3E%3C/svg%3E");
         }
 
         li {
             margin-bottom: 8px;
-            padding-left: 5px;
+            position: relative;
+        }
+
+        li::marker {
+            color: var(--accent-gold);
         }
 
         a {
             color: var(--accent-blue);
             text-decoration: none;
-            position: relative;
+            border-bottom: 1px dotted var(--accent-blue);
             transition: all 0.3s ease;
         }
 
         a:hover {
-            color: var(--accent-tertiary);
+            color: var(--accent-red);
+            border-bottom-color: var(--accent-red);
         }
 
-        a:after {
-            content: "";
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background-color: var(--accent-blue);
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.3s ease;
-        }
-
-        a:hover:after {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-
-        /* 卡片容器样式 */
+        /* 达芬奇风格的卡片容器 */
         .topics-container, .tutorials-container, .messages-container,
         .dialogues-container, .qa-container, .participants-container {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 25px;
+            gap: 30px;
         }
 
-        /* 卡片样式 */
+        /* 达芬奇风格的卡片 */
         .topic-card, .tutorial-card, .message-card,
         .dialogue-card, .qa-card, .participant-item, .night-owl-item {
-            background-color: var(--bg-card);
+            background-color: var(--parchment);
             padding: 25px;
-            border: 1px solid #e0d8c0;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--ink-secondary);
             position: relative;
-            overflow: hidden;
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* 添加羽毛装饰到卡片 */
-        .topic-card:before, .tutorial-card:before, .message-card:before,
-        .dialogue-card:before, .qa-card:before {
+        .topic-card::before, .tutorial-card::before, .message-card::before,
+        .dialogue-card::before, .qa-card::before, .participant-item::before, .night-owl-item::before {
             content: "";
             position: absolute;
             top: 10px;
+            left: 10px;
             right: 10px;
-            width: 40px;
-            height: 40px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,80c20-40,40-60,60-60c-10,20-20,40-60,60z' fill='%23d1c9b7' fill-opacity='0.2'/%3E%3C/svg%3E");
-            background-size: contain;
-            background-repeat: no-repeat;
-            opacity: 0.5;
-            z-index: 0;
+            bottom: 10px;
+            border: 1px dashed rgba(95, 75, 50, 0.3);
+            pointer-events: none;
         }
 
         /* 话题卡片 */
         .topic-category {
             display: inline-block;
-            background-color: rgba(35, 87, 137, 0.1);
-            color: var(--accent-blue);
+            color: var(--parchment);
+            background-color: var(--accent-blue);
             padding: 3px 12px;
-            border-radius: 3px;
-            font-size: 14px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(35, 87, 137, 0.2);
-            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            margin-bottom: 12px;
             font-style: italic;
+            letter-spacing: 1px;
         }
 
         .topic-keywords {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
-            margin: 12px 0;
+            gap: 10px;
+            margin: 15px 0;
         }
 
         .keyword {
-            background-color: rgba(44, 85, 69, 0.1);
-            color: var(--accent-tertiary);
-            padding: 3px 10px;
-            border-radius: 3px;
-            font-size: 14px;
-            border: 1px solid rgba(44, 85, 69, 0.2);
+            background-color: rgba(95, 75, 50, 0.1);
+            padding: 4px 12px;
+            font-size: 16px;
+            border: 1px solid var(--ink-secondary);
         }
 
         .topic-mentions {
-            color: var(--accent-secondary);
+            color: var(--accent-red);
             font-weight: 600;
-            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
         }
 
         /* 教程卡片 */
         .tutorial-type {
             display: inline-block;
-            background-color: rgba(166, 58, 58, 0.1);
-            color: var(--accent-secondary);
+            color: var(--parchment);
+            background-color: var(--accent-red);
             padding: 3px 12px;
-            border-radius: 3px;
-            font-size: 14px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(166, 58, 58, 0.2);
-            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            margin-bottom: 12px;
             font-style: italic;
+            letter-spacing: 1px;
         }
 
         .tutorial-meta {
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            font-size: 15px;
+            color: var(--ink-secondary);
+            margin-bottom: 15px;
+            font-size: 16px;
+            font-style: italic;
         }
 
         .tutorial-category {
-            margin-top: 12px;
+            margin-top: 15px;
             font-style: italic;
-            color: var(--text-secondary);
-            font-family: 'Cormorant Garamond', serif;
+            color: var(--ink-secondary);
+            text-align: right;
         }
 
         /* 消息卡片 */
         .message-meta {
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
 
         .message-meta span {
             margin-right: 15px;
-            font-size: 14px;
+            font-size: 16px;
         }
 
         .message-type {
-            background-color: rgba(217, 165, 102, 0.1);
-            color: var(--accent-yellow);
+            color: var(--parchment);
+            background-color: var(--accent-red);
             padding: 3px 12px;
-            border-radius: 3px;
-            border: 1px solid rgba(217, 165, 102, 0.2);
+            font-style: italic;
         }
 
         .priority {
-            padding: 3px 10px;
-            border-radius: 3px;
+            padding: 3px 12px;
+            font-style: italic;
+            color: var(--parchment);
         }
 
         .priority-high {
-            background-color: rgba(166, 58, 58, 0.1);
-            color: var(--accent-secondary);
-            border: 1px solid rgba(166, 58, 58, 0.2);
+            background-color: var(--accent-red);
         }
 
         .priority-medium {
-            background-color: rgba(139, 69, 19, 0.1);
-            color: var(--accent-primary);
-            border: 1px solid rgba(139, 69, 19, 0.2);
+            background-color: var(--accent-gold);
         }
 
         .priority-low {
-            background-color: rgba(35, 87, 137, 0.1);
-            color: var(--accent-blue);
-            border: 1px solid rgba(35, 87, 137, 0.2);
+            background-color: var(--accent-blue);
         }
 
         /* 对话卡片 */
         .dialogue-type {
             display: inline-block;
-            background-color: rgba(44, 85, 69, 0.1);
-            color: var(--accent-tertiary);
+            color: var(--parchment);
+            background-color: var(--accent-blue);
             padding: 3px 12px;
-            border-radius: 3px;
-            font-size: 14px;
-            margin-bottom: 10px;
-            border: 1px solid rgba(44, 85, 69, 0.2);
-            font-family: 'Cormorant Garamond', serif;
+            font-size: 16px;
+            margin-bottom: 12px;
             font-style: italic;
+            letter-spacing: 1px;
         }
 
         .dialogue-content {
-            background-color: var(--bg-secondary);
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px dashed #d1c9b7;
-            border-radius: 3px;
+            background-color: rgba(95, 75, 50, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(95, 75, 50, 0.2);
         }
 
         .dialogue-highlight {
             font-style: italic;
-            color: var(--accent-primary);
-            margin: 12px 0;
+            color: var(--accent-red);
+            margin: 15px 0;
             font-weight: 600;
-            font-family: 'Cormorant Garamond', serif;
+            text-align: center;
             position: relative;
-            padding-left: 20px;
+            padding: 10px 30px;
         }
 
-        .dialogue-highlight:before {
-            content: "" ";
+        .dialogue-highlight::before, .dialogue-highlight::after {
+            content: '"';
+            font-size: 36px;
+            color: var(--accent-gold);
             position: absolute;
+            top: 5px;
+        }
+
+        .dialogue-highlight::before {
             left: 0;
-            top: -5px;
-            font-size: 30px;
-            color: var(--accent-primary);
-            opacity: 0.5;
+        }
+
+        .dialogue-highlight::after {
+            right: 0;
+            transform: rotate(180deg);
         }
 
         /* 问答卡片 */
         .question {
-            margin-bottom: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(95, 75, 50, 0.3);
         }
 
         .question-meta, .answer-meta {
-            color: var(--text-secondary);
+            color: var(--ink-secondary);
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 16px;
+            font-style: italic;
         }
 
         .question-tags {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             margin-top: 12px;
         }
 
         .tag {
-            background-color: rgba(96, 108, 56, 0.1);
-            color: var(--accent-green);
-            padding: 3px 10px;
-            border-radius: 3px;
+            background-color: rgba(95, 75, 50, 0.1);
+            padding: 4px 12px;
             font-size: 14px;
-            border: 1px solid rgba(96, 108, 56, 0.2);
+            border: 1px solid var(--ink-secondary);
         }
 
         .answer {
-            background-color: var(--bg-secondary);
-            padding: 15px;
-            margin-top: 12px;
-            border: 1px dashed #d1c9b7;
-            border-radius: 3px;
+            background-color: rgba(95, 75, 50, 0.05);
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid rgba(95, 75, 50, 0.2);
+            position: relative;
         }
 
         .accepted-badge {
-            background-color: rgba(139, 69, 19, 0.1);
-            color: var(--accent-primary);
+            background-color: var(--accent-gold);
+            color: var(--parchment);
             padding: 3px 12px;
-            border-radius: 3px;
             font-size: 14px;
-            border: 1px solid rgba(139, 69, 19, 0.2);
-            font-family: 'Cormorant Garamond', serif;
             font-style: italic;
         }
 
@@ -502,145 +466,123 @@
         .heatmap-container {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 18px;
-            margin-top: 20px;
-        }
-
-        .heat-item {
-            background-color: var(--bg-card);
+            gap: 20px;
             padding: 15px;
-            border: 1px solid #e0d8c0;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background-color: rgba(95, 75, 50, 0.05);
+            border: 1px solid rgba(95, 75, 50, 0.2);
         }
 
         .heat-topic {
             font-weight: 600;
             margin-bottom: 8px;
-            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
         }
 
         .heat-bar {
-            height: 22px;
-            background-color: var(--bg-secondary);
+            height: 25px;
+            background-color: rgba(95, 75, 50, 0.1);
             margin: 8px 0;
-            border-radius: 3px;
+            border: 1px solid var(--ink-secondary);
             overflow: hidden;
-            border: 1px solid #e0d8c0;
         }
 
         .heat-fill {
             height: 100%;
-            border-radius: 2px;
         }
 
         /* 话唠榜 */
-        .participant-item {
-            background-color: var(--bg-card);
-            position: relative;
-            padding-left: 60px;
-        }
-
         .participant-rank {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--accent-primary);
-            position: absolute;
-            left: 20px;
-            top: 20px;
-            font-family: 'Cormorant Garamond', serif;
+            font-size: 40px;
+            font-weight: normal;
+            color: var(--accent-gold);
+            margin-right: 20px;
+            float: left;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
         }
 
         .participant-name {
             font-weight: 600;
-            font-size: 18px;
+            font-size: 22px;
             margin-bottom: 8px;
-            color: var(--accent-tertiary);
-            font-family: 'Cormorant Garamond', serif;
+            color: var(--accent-blue);
         }
 
         .participant-count {
-            color: var(--accent-blue);
+            color: var(--accent-red);
             margin-bottom: 12px;
-            font-family: 'Libre Baskerville', serif;
             font-style: italic;
         }
 
         .participant-characteristics, .participant-words {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 10px;
             margin-top: 12px;
         }
 
         .characteristic {
-            background-color: rgba(166, 58, 58, 0.1);
-            color: var(--accent-secondary);
-            padding: 3px 10px;
-            border-radius: 3px;
+            background-color: rgba(95, 75, 50, 0.1);
+            padding: 4px 12px;
             font-size: 14px;
-            border: 1px solid rgba(166, 58, 58, 0.2);
+            border: 1px solid var(--ink-secondary);
         }
 
         .word {
-            background-color: rgba(44, 85, 69, 0.1);
-            color: var(--accent-tertiary);
-            padding: 3px 10px;
-            border-radius: 3px;
+            background-color: rgba(95, 75, 50, 0.1);
+            padding: 4px 12px;
             font-size: 14px;
-            border: 1px solid rgba(44, 85, 69, 0.2);
+            border: 1px solid var(--accent-red);
         }
 
         /* 熬夜冠军 */
         .night-owl-item {
-            background: var(--bg-secondary) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 800 800'%3E%3Cg fill='none' stroke='%23d1c9b7' stroke-width='1'%3E%3Cpath d='M769 229L1037 260.9M927 880L731 737 520 660 309 538 40 599 295 764 126.5 879.5 40 599-197 493 102 382-31 229 126.5 79.5-69-63'/%3E%3Cpath d='M-31 229L237 261 390 382 603 493 308.5 537.5 101.5 381.5M370 905L295 764'/%3E%3Cpath d='M520 660L578 842 731 737 840 599 603 493 520 660 295 764 309 538 390 382 539 269 769 229 577.5 41.5 370 105 295 -36 126.5 79.5 237 261 102 382 40 599 -69 737 127 880'/%3E%3Cpath d='M520-140L578.5 42.5 731-63M603 493L539 269 237 261 370 105M902 382L539 269M390 382L102 382'/%3E%3Cpath d='M-222 42L126.5 79.5 370 105 539 269 577.5 41.5 927 80 769 229 902 382 603 493 731 737M295-36L577.5 41.5M578 842L295 764M40-201L127 80M102 382L-261 269'/%3E%3C/g%3E%3Cg fill='%23d1c9b7'%3E%3Ccircle cx='769' cy='229' r='5'/%3E%3Ccircle cx='539' cy='269' r='5'/%3E%3Ccircle cx='603' cy='493' r='5'/%3E%3Ccircle cx='731' cy='737' r='5'/%3E%3Ccircle cx='520' cy='660' r='5'/%3E%3Ccircle cx='309' cy='538' r='5'/%3E%3Ccircle cx='295' cy='764' r='5'/%3E%3Ccircle cx='40' cy='599' r='5'/%3E%3Ccircle cx='102' cy='382' r='5'/%3E%3Ccircle cx='127' cy='80' r='5'/%3E%3Ccircle cx='370' cy='105' r='5'/%3E%3Ccircle cx='578' cy='42' r='5'/%3E%3Ccircle cx='237' cy='261' r='5'/%3E%3Ccircle cx='390' cy='382' r='5'/%3E%3C/g%3E%3C/svg%3E");
+            background: linear-gradient(135deg, var(--parchment) 0%, var(--parchment-dark) 100%);
             padding: 25px;
             display: flex;
-            align-items: flex-start;
-            position: relative;
+            align-items: center;
+            border: 2px solid var(--accent-gold);
         }
 
         .owl-crown {
-            font-size: 40px;
-            margin-right: 20px;
-            position: relative;
-            z-index: 1;
+            font-size: 48px;
+            margin-right: 25px;
+            color: var(--accent-gold);
         }
 
         .owl-name {
             font-weight: 600;
-            font-size: 20px;
+            font-size: 22px;
             margin-bottom: 8px;
-            color: var(--accent-tertiary);
-            font-family: 'Cormorant Garamond', serif;
+            color: var(--accent-red);
         }
 
         .owl-title {
-            color: var(--accent-primary);
+            color: var(--accent-gold);
             font-style: italic;
             margin-bottom: 12px;
-            font-family: 'Cormorant Garamond', serif;
+            font-size: 18px;
         }
 
         .owl-time, .owl-messages {
-            color: var(--text-secondary);
+            color: var(--ink-secondary);
             margin-bottom: 8px;
+            font-style: italic;
         }
 
         .owl-note {
             font-size: 14px;
-            color: var(--text-secondary);
-            margin-top: 12px;
+            color: var(--ink-secondary);
+            margin-top: 15px;
             font-style: italic;
-            border-top: 1px dashed #d1c9b7;
-            padding-top: 8px;
+            border-top: 1px dotted var(--ink-secondary);
+            padding-top: 10px;
         }
 
-        /* 词云 - 云朵样式 */
+        /* 词云 - 达芬奇草图风格 */
         .cloud-container {
             position: relative;
-            margin: 30px auto;
-            padding: 20px 0;
+            margin: 0 auto;
+            padding: 30px 0;
         }
 
         .cloud-wordcloud {
@@ -648,23 +590,19 @@
             width: 600px;
             height: 400px;
             margin: 0 auto;
-            background-color: var(--bg-secondary);
-            border-radius: 50%;
-            box-shadow: 40px 40px 0 -5px var(--bg-secondary),
-            80px 10px 0 -10px var(--bg-secondary),
-            110px 35px 0 -5px var(--bg-secondary),
-            -40px 50px 0 -8px var(--bg-secondary),
-            -70px 20px 0 -10px var(--bg-secondary);
+            background-color: rgba(95, 75, 50, 0.05);
+            border-radius: 300px / 200px;
+            border: 1px solid var(--ink-secondary);
             overflow: visible;
-            border: 1px solid #e0d8c0;
+            box-shadow: inset 0 0 20px rgba(95, 75, 50, 0.1);
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23594a32' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
         }
 
         .cloud-word {
             position: absolute;
             transform-origin: center;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
         }
 
         .cloud-word:hover {
@@ -673,7 +611,7 @@
         }
 
         .cloud-legend {
-            margin-top: 70px;
+            margin-top: 60px;
             display: flex;
             justify-content: center;
             gap: 30px;
@@ -682,357 +620,1284 @@
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .legend-color {
             width: 20px;
             height: 20px;
-            border-radius: 50%;
-            border: 1px solid #e0d8c0;
+            border-radius: 0;
+            border: 1px solid var(--ink-secondary);
         }
 
-        /* 底部 */
+        /* 达芬奇风格底部 */
         footer {
             text-align: center;
             padding: 30px 0;
             margin-top: 60px;
-            background-color: var(--bg-secondary);
-            color: var(--text-secondary);
-            font-size: 14px;
-            border: 1px solid #e0d8c0;
-            border-radius: 5px;
+            background-color: var(--parchment-dark);
+            color: var(--ink-secondary);
+            font-size: 16px;
+            border-top: 3px double var(--ink-secondary);
             position: relative;
-            overflow: hidden;
+            font-style: italic;
         }
 
-        footer:before, footer:after {
-            content: "";
+        footer::before {
+            content: "Anno Domini";
             position: absolute;
-            width: 80px;
-            height: 60px;
-            background-size: contain;
-            background-repeat: no-repeat;
-            opacity: 0.3;
-        }
-
-        footer:before {
-            bottom: 15px;
-            left: 15px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,50c0,0,5-20,30-20s30,20,30,20s-5,20-30,20S20,50,20,50z' fill='%238b4513'/%3E%3C/svg%3E");
-        }
-
-        footer:after {
-            bottom: 15px;
-            right: 15px;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M20,50c0,0,5-20,30-20s30,20,30,20s-5,20-30,20S20,50,20,50z' fill='%232c5545'/%3E%3C/svg%3E");
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--parchment-dark);
+            padding: 0 20px;
+            color: var(--accent-gold);
+            font-size: 18px;
         }
 
         footer p {
-            margin: 5px 0;
+            margin: 8px 0;
+            text-align: center;
         }
 
         .disclaimer {
-            margin-top: 15px;
+            margin-top: 20px;
             font-style: italic;
-            padding-top: 10px;
-            border-top: 1px dashed #d1c9b7;
+            padding-top: 15px;
+            border-top: 1px solid rgba(95, 75, 50, 0.3);
+            font-size: 14px;
         }
 
-        /* 媒体查询以确保在移动设备上的响应式布局 */
-        @media (max-width: 1220px) {
+        /* 达芬奇风格装饰元素 */
+        .davinci-ornament {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 24px;
+            color: var(--accent-gold);
+        }
+
+        /* 核心概念关系图样式 - 达芬奇风格 */
+        .mindmap-section {
+            background-color: var(--parchment-dark);
+            margin-bottom: 40px;
+            padding: 30px;
+            border: 1px solid var(--ink-secondary);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23785c38' fill-opacity='0.05'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .mindmap-section::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid rgba(95, 75, 50, 0.2);
+            pointer-events: none;
+        }
+
+        /* 思维导图说明文字 */
+        .mindmap-description {
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--ink-secondary);
+            font-style: italic;
+            font-size: 16px;
+            padding: 15px;
+            background-color: rgba(95, 75, 50, 0.05);
+            border: 1px solid rgba(95, 75, 50, 0.2);
+        }
+
+
+
+        .mindmap-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mindmap-controls button {
+            background-color: var(--accent-blue);
+            color: var(--parchment);
+            border: 1px solid var(--ink-secondary);
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+            position: relative;
+        }
+
+        .mindmap-controls button:hover {
+            background-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .mindmap-controls .fullscreen-toggle-btn {
+            background-color: var(--accent-gold);
+        }
+
+        .mindmap-controls #resetZoomBtn {
+            background-color: var(--accent-green);
+        }
+
+        .mermaid-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            background-color: var(--parchment);
+            border: 3px double var(--ink-secondary);
+            padding: 30px;
+            min-height: 450px;
+            cursor: grab;
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(95, 75, 50, 0.1);
+            background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23785c38' fill-opacity='0.03' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        .mermaid-container.dragging {
+            cursor: grabbing;
+        }
+
+        .mermaid-container:empty::before {
+            content: "✨ 思维导图将在此处显示，展现讨论主题的层次结构和关联关系";
+            color: var(--ink-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 40px;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-size: 18px;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        .mermaid-container svg {
+            max-width: none;
+            height: auto;
+            display: block;
+            transition: transform 0.3s ease-out;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.1));
+        }
+
+        /* Mermaid反馈消息 */
+        #mermaid-main-feedback-message, #mermaid-modal-feedback-message {
+            text-align: center;
+            margin-top: 15px;
+            padding: 12px;
+            font-weight: 500;
+            font-size: 16px;
+            display: none;
+            border: 1px solid var(--ink-secondary);
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+        }
+
+        #mermaid-main-feedback-message.success, #mermaid-modal-feedback-message.success {
+            color: var(--accent-green);
+            background-color: rgba(99, 114, 81, 0.1);
+            display: block;
+        }
+
+        #mermaid-main-feedback-message.error, #mermaid-modal-feedback-message.error {
+            color: var(--accent-red);
+            background-color: rgba(155, 46, 46, 0.1);
+            display: block;
+        }
+
+        #mermaid-main-feedback-message.info, #mermaid-modal-feedback-message.info {
+            color: var(--accent-blue);
+            background-color: rgba(78, 93, 114, 0.1);
+            display: block;
+        }
+
+        /* 全屏模态框样式 - 达芬奇风格 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(60, 36, 21, 0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 95%;
+            height: 90%;
+            max-width: 1200px;
+            background-color: var(--parchment-dark);
+            border: 3px double var(--ink-secondary);
+            padding: 30px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2.2rem;
+            color: var(--ink-secondary);
+            cursor: pointer;
+            line-height: 1;
+            padding: 5px;
+            z-index: 1010;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--accent-red);
+        }
+
+        #modalMermaidContainer {
+            flex-grow: 1;
+            min-height: 0;
+        }
+
+        #modalMermaidContainer:empty::before {
+            content: "导图内容将在此显示。";
+            color: var(--ink-secondary);
+            font-style: italic;
+            text-align: center;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+        }
+
+        /* 操作按钮样式 - 达芬奇风格 */
+        .action-buttons-container {
+            text-align: center;
+            margin: 40px 0;
+            padding: 30px;
+            background-color: var(--parchment-dark);
+            border: 1px solid var(--ink-secondary);
+            position: relative;
+        }
+
+        .action-buttons-container::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            border: 1px solid rgba(95, 75, 50, 0.2);
+            pointer-events: none;
+        }
+
+        .action-button {
+            background-color: var(--accent-blue);
+            color: var(--parchment);
+            border: 1px solid var(--ink-secondary);
+            padding: 12px 24px;
+            font-size: 18px;
+            font-weight: normal;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 8px 12px;
+            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .action-button:hover {
+            background-color: var(--accent-red);
+            transform: translateY(-2px);
+            box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .action-button i, .action-button .fas {
+            margin-right: 8px;
+        }
+
+        #feedback-message {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 500;
+            font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif;
+            font-style: italic;
+            font-size: 18px;
+        }
+
+        #feedback-message.success {
+            color: var(--accent-green);
+        }
+
+        #feedback-message.error {
+            color: var(--accent-red);
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
             body {
                 width: 95%;
                 padding: 10px;
             }
-        }
 
-        @media (max-width: 768px) {
             .cloud-wordcloud {
                 width: 90%;
-                height: 300px;
+                height: 350px;
             }
 
-            .meta-info {
+            .mindmap-controls {
                 flex-direction: column;
                 gap: 10px;
             }
 
-            .meta-info span {
-                display: block;
+            .mindmap-controls button {
+                width: 100%;
+                max-width: 200px;
             }
 
-            header:before, header:after {
-                width: 80px;
-                height: 60px;
+            .modal-content {
+                width: 100%;
+                height: 95%;
+                padding: 20px;
+            }
+
+            .modal-close-btn {
+                font-size: 1.8rem;
+                top: 10px;
+                right: 10px;
+            }
+
+            .action-buttons-container {
+                padding: 20px;
+            }
+
+            .action-button {
+                display: block;
+                width: 80%;
+                margin: 8px auto;
+                max-width: 300px;
             }
         }
     </style>
 </head>
 <body>
-<header>
-    <h1>[群名称]日报</h1>
-    <p class="date">[日期范围]</p>
-    <div class="meta-info">
-        <span>总消息数：[数量]</span>
-        <span>日均消息数：[数量]</span>
-        <span>活跃用户：[数量]</span>
-        <span>时间范围：[时间范围]</span>
-    </div>
-</header>
-
-<!-- 1. 今日讨论热点 -->
-<section class="hot-topics">
-    <h2>今日讨论热点</h2>
-    <div class="topics-container">
-        <!-- 在这里填充讨论热点内容，严格按照以下格式，保留3-5个话题 -->
-        <div class="topic-card">
-            <h3>[热点话题名称]</h3>
-            <div class="topic-category">[话题分类]</div>
-            <p class="topic-summary">[简要总结(50-100字)]</p>
-            <div class="topic-keywords">
-                <span class="keyword">[关键词1]</span>
-                <span class="keyword">[关键词2]</span>
-                <!-- 添加更多关键词 -->
-            </div>
-            <div class="topic-mentions">提及次数：[次数]</div>
+    <header>
+        <h1>[群名称]日报</h1>
+        <p class="date">[日期范围]</p>
+        <div class="meta-info">
+            <span>总消息数：[数量]</span>
+            <span>日均消息数：[数量]</span>
+            <span>活跃用户：[数量]</span>
+            <span>时间范围：[时间范围]</span>
         </div>
-        <!-- 复制上述卡片结构添加更多话题 -->
-    </div>
-</section>
+    </header>
 
-<!-- 2. 实用教程与资源分享 -->
-<section class="tutorials">
-    <h2>实用教程与资源分享</h2>
-    <div class="tutorials-container">
-        <!-- 在这里填充教程和资源内容，严格按照以下格式 -->
-        <div class="tutorial-card">
-            <div class="tutorial-type">[TUTORIAL | NEWS | RESOURCE]</div>
-            <h3>[分享的教程或资源标题]</h3>
-            <div class="tutorial-meta">
-                <span class="shared-by">分享者：[昵称]</span>
-                <span class="share-time">时间：[时间]</span>
+    <!-- 1. 今日讨论热点 -->
+    <section class="hot-topics">
+        <h2>今日讨论热点</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+        <div class="topics-container">
+            <!-- 在这里填充讨论热点内容，达芬奇风格 -->
+            <div class="topic-card">
+                <h3>[热点话题名称]</h3>
+                <div class="topic-category">[话题分类]</div>
+                <p class="topic-summary">[简要总结(50-100字)]</p>
+                <div class="topic-keywords">
+                    <span class="keyword">[关键词1]</span>
+                    <span class="keyword">[关键词2]</span>
+                    <!-- 添加更多关键词 -->
+                </div>
+                <div class="topic-mentions">提及次数：[次数]</div>
             </div>
-            <p class="tutorial-summary">[内容简介]</p>
-            <div class="key-points">
-                <h4>要点：</h4>
-                <ul>
-                    <li>[要点1]</li>
-                    <li>[要点2]</li>
-                    <!-- 添加更多要点 -->
-                </ul>
-            </div>
-            <div class="tutorial-link">
-                <a href="[URL]" class="link valid">查看原文: [域名]</a>
-            </div>
-            <div class="tutorial-category">分类：[分类]</div>
+            <!-- 复制上述卡片结构添加更多话题 -->
         </div>
-        <!-- 复制上述卡片结构添加更多资源 -->
-    </div>
-</section>
+    </section>
 
-<!-- 3. 重要消息汇总 -->
-<section class="important-messages">
-    <h2>重要消息汇总</h2>
-    <div class="messages-container">
-        <!-- 在这里填充重要消息内容，严格按照以下格式 -->
-        <div class="message-card">
-            <div class="message-meta">
-                <span class="time">[消息时间]</span>
-                <span class="sender">[发送者昵称]</span>
-                <span class="message-type">[NOTICE | EVENT | ANNOUNCEMENT | OTHER]</span>
-                <span class="priority priority-high">优先级：[高|中|低]</span>
+    <!-- 2. 实用教程与资源分享 -->
+    <section class="tutorials">
+        <h2>实用教程与资源分享</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+        <div class="tutorials-container">
+            <!-- 在这里填充教程和资源内容，达芬奇风格 -->
+            <div class="tutorial-card">
+                <div class="tutorial-type">[TUTORIAL | NEWS | RESOURCE]</div>
+                <h3>[分享的教程或资源标题]</h3>
+                <div class="tutorial-meta">
+                    <span class="shared-by">分享者：[昵称]</span>
+                    <span class="share-time">时间：[时间]</span>
+                </div>
+                <p class="tutorial-summary">[内容简介]</p>
+                <div class="key-points">
+                    <h4>要点：</h4>
+                    <ul>
+                        <li>[要点1]</li>
+                        <li>[要点2]</li>
+                        <!-- 添加更多要点 -->
+                    </ul>
+                </div>
+                <div class="tutorial-link">
+                    <a href="[URL]" class="link valid">查看原文: [域名]</a>
+                </div>
+                <div class="tutorial-category">分类：[分类]</div>
             </div>
-            <p class="message-content">[消息内容]</p>
-            <div class="message-full-content">
-                <p>[完整通知内容]</p>
+            <!-- 复制上述卡片结构添加更多资源 -->
+        </div>
+    </section>
+
+    <!-- 3. 核心概念关系图 -->
+    <section class="mindmap-section">
+        <h2>核心概念关系图</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+
+        <!-- 思维导图说明 -->
+        <div class="mindmap-description">
+            📝 展示讨论主题之间的关联关系。支持缩放查看、全屏模式和导出功能。
+        </div>
+
+        <!-- 控制按钮 -->
+        <div class="mindmap-controls">
+            <button id="zoomInBtn">🔍+ 放大</button>
+            <button id="zoomOutBtn">🔍- 缩小</button>
+            <button id="resetZoomBtn">🔄 重置缩放</button>
+            <button id="downloadDiagramBtn">📥 下载导图</button>
+            <button id="fullscreenOpenBtn" class="fullscreen-toggle-btn">⛶ 全屏</button>
+        </div>
+
+        <!-- 思维导图容器 -->
+        <div class="mermaid-container" id="mainMermaidContainer">
+            <div class="mermaid" id="mindmapDiagram">
+                mindmap
+                  root((今日讨论核心))
+                    技术分享
+                      AI工具
+                        ChatGPT应用
+                        代码生成
+                      开发技巧
+                        最佳实践
+                        性能优化
+                    问题解答
+                      技术难题
+                        解决方案
+                        经验分享
+                      学习资源
+                        教程推荐
+                        书籍分享
+                    日常交流
+                      工作心得
+                      生活分享
             </div>
         </div>
-        <!-- 复制上述卡片结构添加更多消息 -->
-    </div>
-</section>
+        <div id="mermaid-main-feedback-message"></div>
+    </section>
 
-<!-- 4. 有趣对话或金句 -->
-<section class="interesting-dialogues">
-    <h2>有趣对话或金句</h2>
-    <div class="dialogues-container">
-        <!-- 在这里填充对话内容，严格按照以下格式 -->
-        <div class="dialogue-card">
-            <div class="dialogue-type">[DIALOGUE | QUOTE]</div>
-            <div class="dialogue-content">
-                <div class="message">
-                    <div class="message-meta">
-                        <span class="speaker">[说话者昵称]</span>
-                        <span class="time">[发言时间]</span>
+    <!-- 4. 重要消息汇总 -->
+    <section class="important-messages">
+        <h2>重要消息汇总</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+        <div class="messages-container">
+            <!-- 在这里填充重要消息内容，达芬奇风格 -->
+            <div class="message-card">
+                <div class="message-meta">
+                    <span class="time">[消息时间]</span>
+                    <span class="sender">[发送者昵称]</span>
+                    <span class="message-type">[NOTICE | EVENT | ANNOUNCEMENT | OTHER]</span>
+                    <span class="priority priority-high">优先级：[高|中|低]</span>
+                </div>
+                <p class="message-content">[消息内容]</p>
+                <div class="message-full-content">
+                    <p>[完整通知内容]</p>
+                </div>
+            </div>
+            <!-- 复制上述卡片结构添加更多消息 -->
+        </div>
+    </section>
+
+    <!-- 5. 有趣对话或金句 -->
+    <section class="interesting-dialogues">
+        <h2>有趣对话或金句</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+        <div class="dialogues-container">
+            <!-- 在这里填充对话内容，达芬奇风格 -->
+            <div class="dialogue-card">
+                <div class="dialogue-type">[DIALOGUE | QUOTE]</div>
+                <div class="dialogue-content">
+                    <div class="message">
+                        <div class="message-meta">
+                            <span class="speaker">[说话者昵称]</span>
+                            <span class="time">[发言时间]</span>
+                        </div>
+                        <p class="message-content">[消息内容]</p>
                     </div>
-                    <p class="message-content">[消息内容]</p>
-                </div>
-                <div class="message">
-                    <div class="message-meta">
-                        <span class="speaker">[说话者昵称]</span>
-                        <span class="time">[发言时间]</span>
+                    <div class="message">
+                        <div class="message-meta">
+                            <span class="speaker">[说话者昵称]</span>
+                            <span class="time">[发言时间]</span>
+                        </div>
+                        <p class="message-content">[消息内容]</p>
                     </div>
-                    <p class="message-content">[消息内容]</p>
+                    <!-- 添加更多对话消息 -->
                 </div>
-                <!-- 添加更多对话消息 -->
+                <div class="dialogue-highlight">[对话中的金句或亮点]</div>
+                <div class="dialogue-topic">相关话题：[某某话题]</div>
             </div>
-            <div class="dialogue-highlight">[对话中的金句或亮点]</div>
-            <div class="dialogue-topic">相关话题：[某某话题]</div>
+            <!-- 复制上述卡片结构添加更多对话 -->
         </div>
-        <!-- 复制上述卡片结构添加更多对话 -->
-    </div>
-</section>
+    </section>
 
-<!-- 5. 问题与解答 -->
-<section class="questions-answers">
-    <h2>问题与解答</h2>
-    <div class="qa-container">
-        <!-- 在这里填充问答内容，严格按照以下格式 -->
-        <div class="qa-card">
-            <div class="question">
-                <div class="question-meta">
-                    <span class="asker">[提问者昵称]</span>
-                    <span class="time">[提问时间]</span>
-                </div>
-                <p class="question-content">[问题内容]</p>
-                <div class="question-tags">
-                    <span class="tag">[相关标签1]</span>
-                    <span class="tag">[相关标签2]</span>
-                    <!-- 添加更多标签 -->
-                </div>
-            </div>
-            <div class="answers">
-                <div class="answer">
-                    <div class="answer-meta">
-                        <span class="responder">[回答者昵称]</span>
-                        <span class="time">[回答时间]</span>
-                        <span class="accepted-badge">最佳回答</span>
+    <!-- 6. 问题与解答 -->
+    <section class="questions-answers">
+        <h2>问题与解答</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+        <div class="qa-container">
+            <!-- 在这里填充问答内容，达芬奇风格 -->
+            <div class="qa-card">
+                <div class="question">
+                    <div class="question-meta">
+                        <span class="asker">[提问者昵称]</span>
+                        <span class="time">[提问时间]</span>
                     </div>
-                    <p class="answer-content">[回答内容]</p>
+                    <p class="question-content">[问题内容]</p>
+                    <div class="question-tags">
+                        <span class="tag">[相关标签1]</span>
+                        <span class="tag">[相关标签2]</span>
+                        <!-- 添加更多标签 -->
+                    </div>
                 </div>
-                <!-- 添加更多回答 -->
-            </div>
-        </div>
-        <!-- 复制上述卡片结构添加更多问答 -->
-    </div>
-</section>
-
-<!-- 6. 群内数据可视化 -->
-<section class="analytics">
-    <h2>群内数据可视化</h2>
-
-    <!-- 话题热度 -->
-    <h3>话题热度</h3>
-    <div class="heatmap-container">
-        <!-- 在这里填充话题热度数据，严格按照以下格式 -->
-        <div class="heat-item">
-            <div class="heat-topic">[话题名称]</div>
-            <div class="heat-percentage">[百分比]%</div>
-            <div class="heat-bar">
-                <div class="heat-fill" style="width: [百分比]%; background-color: #2c5545;"></div>
-            </div>
-            <div class="heat-count">[数量]条消息</div>
-        </div>
-        <!-- 复制上述结构添加更多热度项，每项使用不同颜色 -->
-        <div class="heat-item">
-            <div class="heat-topic">[话题名称]</div>
-            <div class="heat-percentage">[百分比]%</div>
-            <div class="heat-bar">
-                <div class="heat-fill" style="width: [百分比]%; background-color: #8b4513;"></div>
-            </div>
-            <div class="heat-count">[数量]条消息</div>
-        </div>
-        <!-- 可用的颜色: #2c5545, #8b4513, #235789, #a63a3a, #d9a566, #606c38 -->
-    </div>
-
-    <!-- 话唠榜 -->
-    <h3>话唠榜</h3>
-    <div class="participants-container">
-        <!-- 在这里填充话唠榜数据，严格按照以下格式 -->
-        <div class="participant-item">
-            <div class="participant-rank">1</div>
-            <div class="participant-info">
-                <div class="participant-name">[群友昵称]</div>
-                <div class="participant-count">[数量]条消息</div>
-                <div class="participant-characteristics">
-                    <span class="characteristic">[特点1]</span>
-                    <span class="characteristic">[特点2]</span>
-                    <!-- 添加更多特点 -->
-                </div>
-                <div class="participant-words">
-                    <span class="word">[常用词1]</span>
-                    <span class="word">[常用词2]</span>
-                    <!-- 添加更多常用词 -->
+                <div class="answers">
+                    <div class="answer">
+                        <div class="answer-meta">
+                            <span class="responder">[回答者昵称]</span>
+                            <span class="time">[回答时间]</span>
+                            <span class="accepted-badge">最佳回答</span>
+                        </div>
+                        <p class="answer-content">[回答内容]</p>
+                    </div>
+                    <!-- 添加更多回答 -->
                 </div>
             </div>
+            <!-- 复制上述卡片结构添加更多问答 -->
         </div>
-        <!-- 复制上述结构添加更多参与者 -->
+    </section>
+
+    <!-- 7. 群内数据可视化 -->
+    <section class="analytics">
+        <h2>群内数据可视化</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+
+        <!-- 话题热度 -->
+        <h3>话题热度</h3>
+        <div class="heatmap-container">
+            <!-- 在这里填充话题热度数据，达芬奇风格 -->
+            <div class="heat-item">
+                <div class="heat-topic">[话题名称]</div>
+                <div class="heat-percentage">[百分比]%</div>
+                <div class="heat-bar">
+                    <div class="heat-fill" style="width: [百分比]%; background-color: var(--accent-blue);"></div>
+                </div>
+                <div class="heat-count">[数量]条消息</div>
+            </div>
+            <!-- 复制上述结构添加更多热度项 -->
+            <div class="heat-item">
+                <div class="heat-topic">[话题名称]</div>
+                <div class="heat-percentage">[百分比]%</div>
+                <div class="heat-bar">
+                    <div class="heat-fill" style="width: [百分比]%; background-color: var(--accent-red);"></div>
+                </div>
+                <div class="heat-count">[数量]条消息</div>
+            </div>
+            <!-- 可用的颜色: var(--accent-blue), var(--accent-red), var(--accent-gold), var(--accent-green), var(--accent-sepia) -->
+        </div>
+
+        <!-- 话唠榜 -->
+        <h3>话唠榜</h3>
+        <div class="participants-container">
+            <!-- 在这里填充话唠榜数据，达芬奇风格 -->
+            <div class="participant-item">
+                <div class="participant-rank">1</div>
+                <div class="participant-info">
+                    <div class="participant-name">[群友昵称]</div>
+                    <div class="participant-count">[数量]条消息</div>
+                    <div class="participant-characteristics">
+                        <span class="characteristic">[特点1]</span>
+                        <span class="characteristic">[特点2]</span>
+                        <!-- 添加更多特点 -->
+                    </div>
+                    <div class="participant-words">
+                        <span class="word">[常用词1]</span>
+                        <span class="word">[常用词2]</span>
+                        <!-- 添加更多常用词 -->
+                    </div>
+                </div>
+            </div>
+            <!-- 复制上述结构添加更多参与者 -->
+        </div>
+
+        <!-- 熬夜冠军 -->
+        <h3>熬夜冠军</h3>
+        <div class="night-owls-container">
+            <!-- 在这里填充熬夜冠军数据，达芬奇风格 -->
+            <div class="night-owl-item">
+                <div class="owl-crown" title="熬夜冠军">👑</div>
+                <div class="owl-info">
+                    <div class="owl-name">[熬夜冠军昵称]</div>
+                    <div class="owl-title">[熬夜冠军称号]</div>
+                    <div class="owl-time">最晚活跃时间：[时间]</div>
+                    <div class="owl-messages">深夜消息数：[数量]</div>
+                    <div class="owl-last-message">[最后一条深夜消息内容]</div>
+                    <div class="owl-note">注：熬夜时段定义为23:00-06:00，已考虑不同时区</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. 词云 -->
+    <section class="word-cloud">
+        <h2>热门词云</h2>
+        <div class="davinci-ornament">✦ ✦ ✦</div>
+        <div class="cloud-container">
+            <!-- 词云容器 - 达芬奇草图风格 -->
+            <div class="cloud-wordcloud" id="word-cloud">
+                <!-- 为每个词创建一个span元素，使用绝对定位放置 -->
+                <!-- 以下是一些示例，请根据实际内容生成40-60个词 -->
+                <span class="cloud-word" style="left: 300px; top: 120px; font-size: 38px; color: var(--accent-blue); transform: rotate(-15deg); font-weight: bold;">[关键词1]</span>
+
+                <span class="cloud-word" style="left: 180px; top: 150px; font-size: 32px; color: var(--accent-red); transform: rotate(5deg); font-weight: bold;">[关键词2]</span>
+
+                <span class="cloud-word" style="left: 400px; top: 180px; font-size: 28px; color: var(--accent-gold); transform: rotate(-5deg);">[关键词3]</span>
+
+                <span class="cloud-word" style="left: 250px; top: 220px; font-size: 24px; color: var(--accent-green); transform: rotate(10deg);">[关键词4]</span>
+
+                <span class="cloud-word" style="left: 350px; top: 90px; font-size: 22px; color: var(--accent-sepia); transform: rotate(-10deg);">[关键词5]</span>
+
+                <!-- 继续添加更多词 -->
+            </div>
+
+            <div class="cloud-legend">
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: var(--accent-blue);"></span>
+                    <span class="legend-label">[分类1] 相关词汇</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: var(--accent-red);"></span>
+                    <span class="legend-label">[分类2] 相关词汇</span>
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color" style="background-color: var(--accent-gold);"></span>
+                    <span class="legend-label">[分类3] 相关词汇</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons-container">
+        <button id="screenshotToClipboardBtn" class="action-button">📋 拷贝截图</button>
+        <button id="screenshotDownloadBtn" class="action-button">📷 下载截图</button>
+        <button id="copyHtmlBtn" class="action-button">📄 拷贝源码</button>
+        <button id="downloadHtmlBtn" class="action-button">💾 下载报告</button>
+    </div>
+    <div id="feedback-message"></div>
+
+    <!-- 全屏模态框 -->
+    <div id="fullscreenModal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="fullscreenCloseBtn" class="modal-close-btn" aria-label="关闭全屏">&times;</button>
+            <h2>核心概念关系图 (全屏)</h2>
+            <div class="davinci-ornament">✦ ✦ ✦</div>
+            <div class="mindmap-controls">
+                <button id="modalZoomInBtn">🔍+ 放大</button>
+                <button id="modalZoomOutBtn">🔍- 缩小</button>
+                <button id="modalDownloadDiagramBtn">📥 下载导图</button>
+            </div>
+            <div class="mermaid-container" id="modalMermaidContainer">
+            </div>
+            <div id="mermaid-modal-feedback-message"></div>
+        </div>
     </div>
 
-    <!-- 熬夜冠军 -->
-    <h3>熬夜冠军</h3>
-    <div class="night-owls-container">
-        <!-- 在这里填充熬夜冠军数据，严格按照以下格式 -->
-        <div class="night-owl-item">
-            <div class="owl-crown" title="熬夜冠军">👑</div>
-            <div class="owl-info">
-                <div class="owl-name">[熬夜冠军昵称]</div>
-                <div class="owl-title">[熬夜冠军称号]</div>
-                <div class="owl-time">最晚活跃时间：[时间]</div>
-                <div class="owl-messages">深夜消息数：[数量]</div>
-                <div class="owl-last-message">[最后一条深夜消息内容]</div>
-                <div class="owl-note">注：熬夜时段定义为23:00-06:00，已考虑不同时区</div>
-            </div>
-        </div>
-    </div>
-</section>
+    <!-- 9. 页面底部 -->
+    <footer>
+        <p>数据来源：[群名称]聊天记录</p>
+        <p>生成时间：<span class="generation-time">[当前时间]</span></p>
+        <p>统计周期：[日期] [时间范围]</p>
+        <p class="disclaimer">免责声明：本报告内容基于群聊公开讨论，如有不当内容或侵权问题请联系管理员处理。</p>
+    </footer>
 
-<!-- 7. 词云 -->
-<section class="word-cloud">
-    <h2>热门词云</h2>
-    <div class="cloud-container">
-        <!-- 词云容器 - 现在是云朵样式 -->
-        <div class="cloud-wordcloud" id="word-cloud">
-            <!-- 为每个词创建一个span元素，使用绝对定位放置 -->
-            <!-- 以下是一些示例，请根据实际内容生成40-60个词 -->
-            <span class="cloud-word" style="left: 300px; top: 120px; font-size: 38px; color: #2c5545; transform: rotate(-15deg); font-weight: bold;">[关键词1]</span>
+    <script>
+    // --- Mermaid Diagram JavaScript START ---
+    // --- Global Variables for Mermaid ---
+    let mainCurrentScale = 1;
+    let modalCurrentScale = 1;
+    let currentMindmapDefinition = ''; // Store the current definition
 
-            <span class="cloud-word" style="left: 180px; top: 150px; font-size: 32px; color: #8b4513; transform: rotate(5deg); font-weight: bold;">[关键词2]</span>
-
-            <span class="cloud-word" style="left: 400px; top: 180px; font-size: 28px; color: #a63a3a; transform: rotate(-5deg);">[关键词3]</span>
-
-            <span class="cloud-word" style="left: 250px; top: 220px; font-size: 24px; color: #d9a566; transform: rotate(10deg);">[关键词4]</span>
-
-            <span class="cloud-word" style="left: 350px; top: 90px; font-size: 22px; color: #235789; transform: rotate(-10deg);">[关键词5]</span>
-
-            <!-- 继续添加更多词 -->
-        </div>
-
-        <div class="cloud-legend">
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #2c5545;"></span>
-                <span class="legend-label">[分类1] 相关词汇</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #8b4513;"></span>
-                <span class="legend-label">[分类2] 相关词汇</span>
-            </div>
-            <div class="legend-item">
-                <span class="legend-color" style="background-color: #235789;"></span>
-                <span class="legend-label">[分类3] 相关词汇</span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- 8. 页面底部 -->
-<footer>
-    <p>数据来源：[群名称]聊天记录</p>
-    <p>生成时间：<span class="generation-time">[当前时间]</span></p>
-    <p>统计周期：[日期] [时间范围]</p>
-    <p class="disclaimer">免责声明：本报告内容基于群聊公开讨论，如有不当内容或侵权问题请联系管理员处理。</p>
-</footer>
+    // --- DOM Elements for Mermaid ---
+    const mainZoomInBtn = document.getElementById('zoomInBtn');
+    const mainZoomOutBtn = document.getElementById('zoomOutBtn');
+    const resetZoomBtn = document.getElementById('resetZoomBtn');
+    const mainDownloadDiagramBtn = document.getElementById('downloadDiagramBtn');
+    const mainMermaidContainer = document.getElementById('mainMermaidContainer');
+    const mermaidMainFeedbackMessage = document.getElementById('mermaid-main-feedback-message');
+    const mainMindmapDiagramDiv = document.getElementById('mindmapDiagram');
 
 
-</body>
-</html>
+
+    const fullscreenOpenBtn = document.getElementById('fullscreenOpenBtn');
+    const fullscreenModal = document.getElementById('fullscreenModal');
+    const fullscreenCloseBtn = document.getElementById('fullscreenCloseBtn');
+    const modalMermaidContainer = document.getElementById('modalMermaidContainer');
+    const modalZoomInBtn = document.getElementById('modalZoomInBtn');
+    const modalZoomOutBtn = document.getElementById('modalZoomOutBtn');
+    const modalDownloadDiagramBtn = document.getElementById('modalDownloadDiagramBtn');
+    const mermaidModalFeedbackMessage = document.getElementById('mermaid-modal-feedback-message');
+
+    // --- Mermaid Initialization ---
+    if (typeof mermaid !== 'undefined') {
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            fontFamily: '"Cormorant Garamond", "STKaiti", "KaiTi", serif',
+            mindmap: { padding: 15 }
+        });
+    } else {
+        console.error("Mermaid library not loaded.");
+        if(mermaidMainFeedbackMessage) mermaidMainFeedbackMessage.textContent = "错误：Mermaid库未能加载。";
+    }
+
+    // --- Helper Functions for Mermaid ---
+    function showMermaidFeedback(element, message, type = 'info', duration = 3000) {
+        if (element) {
+            element.textContent = message;
+            element.className = type;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.textContent = '';
+                element.className = '';
+                element.style.display = 'none';
+            }, duration);
+        }
+    }
+
+    function applySvgScale(svgElement, scale) {
+        if (svgElement) {
+            svgElement.style.transform = `scale(${scale})`;
+            svgElement.style.transformOrigin = 'center center';
+        }
+    }
+
+    function makeDraggable(containerElement) {
+        let isDragging = false;
+        let startX, startY, scrollLeftStart, scrollTopStart;
+
+        if (!containerElement) return;
+
+        containerElement.addEventListener('mousedown', (e) => {
+            if (e.button !== 0) return;
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('[onclick]')) return;
+
+            if (e.target === containerElement) {
+                const verticalScrollbarVisible = containerElement.scrollHeight > containerElement.clientHeight;
+                const horizontalScrollbarVisible = containerElement.scrollWidth > containerElement.clientWidth;
+                const clickedOnVerticalScrollbar = verticalScrollbarVisible && e.offsetX >= containerElement.clientWidth - 17;
+                const clickedOnHorizontalScrollbar = horizontalScrollbarVisible && e.offsetY >= containerElement.clientHeight - 17;
+                if (clickedOnVerticalScrollbar || clickedOnHorizontalScrollbar) return;
+            }
+
+            isDragging = true;
+            startX = e.pageX; startY = e.pageY;
+            scrollLeftStart = containerElement.scrollLeft; scrollTopStart = containerElement.scrollTop;
+            containerElement.classList.add('dragging');
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            const deltaX = e.pageX - startX; const deltaY = e.pageY - startY;
+            containerElement.scrollLeft = scrollLeftStart - deltaX;
+            containerElement.scrollTop = scrollTopStart - deltaY;
+        });
+
+        document.addEventListener('mouseup', (e) => {
+            if (e.button !== 0 || !isDragging) return;
+            isDragging = false;
+            containerElement.classList.remove('dragging');
+        });
+
+        containerElement.addEventListener('touchstart', (e) => {
+            if (e.target.closest('button') || e.target.closest('a') || e.target.closest('[onclick]')) return;
+            if (e.touches.length === 1) {
+                isDragging = true;
+                const touch = e.touches[0];
+                startX = touch.pageX;
+                startY = touch.pageY;
+                scrollLeftStart = containerElement.scrollLeft;
+                scrollTopStart = containerElement.scrollTop;
+                containerElement.classList.add('dragging');
+            }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            const touch = e.touches[0];
+            const deltaX = touch.pageX - startX;
+            const deltaY = touch.pageY - startY;
+            containerElement.scrollLeft = scrollLeftStart - deltaX;
+            containerElement.scrollTop = scrollTopStart - deltaY;
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            containerElement.classList.remove('dragging');
+        });
+    }
+
+    async function downloadMermaidAsSVG(svgElement, baseFilename, feedbackElem) {
+        if (svgElement && svgElement.innerHTML.trim() !== "") {
+            try {
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                const blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${baseFilename}.svg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                showMermaidFeedback(feedbackElem, `${baseFilename}.svg 已下载!`, 'success');
+            } catch (error) {
+                console.error(`Error during SVG download for ${baseFilename}:`, error);
+                showMermaidFeedback(feedbackElem, `下载 ${baseFilename}.svg 失败: ${error.message}`, 'error');
+            }
+        } else {
+            showMermaidFeedback(feedbackElem, '无法下载：图表内容为空。', 'error');
+        }
+    }
+
+    async function renderDiagram(definition, targetContainer, scaleVariableRef, feedbackElem, uniqueSvgId) {
+        if (!targetContainer) {
+            console.error("Target container for Mermaid diagram not found.");
+            return null;
+        }
+        targetContainer.innerHTML = '<p style="text-align:center; padding:20px; font-family: \'Cormorant Garamond\', \'STKaiti\', \'KaiTi\', serif; font-style: italic; color: var(--ink-secondary);">图表加载中...</p>';
+        targetContainer.classList.remove('empty');
+
+        if (!definition || definition.trim() === "" || definition.trim().toLowerCase() === "mindmap") {
+            targetContainer.innerHTML = '';
+            targetContainer.classList.add('empty');
+            return null;
+        }
+
+        currentMindmapDefinition = definition;
+
+        try {
+            if (typeof mermaid === 'undefined') throw new Error("Mermaid library is not available.");
+            const {svg, bindFunctions} = await mermaid.render(uniqueSvgId, definition);
+            targetContainer.innerHTML = svg;
+            if (bindFunctions) bindFunctions(targetContainer);
+
+            const svgElement = targetContainer.querySelector('svg');
+            if (svgElement) {
+                if (targetContainer === mainMermaidContainer) mainCurrentScale = 1;
+                else if (targetContainer === modalMermaidContainer) modalCurrentScale = 1;
+
+                applySvgScale(svgElement, scaleVariableRef.value);
+                makeDraggable(targetContainer);
+                return svgElement;
+            } else {
+                targetContainer.innerHTML = '';
+                targetContainer.classList.add('empty');
+                showMermaidFeedback(feedbackElem, '图表生成了，但未找到SVG内容。', 'error');
+                return null;
+            }
+        } catch (error) {
+            console.error("Error rendering Mermaid:", error);
+            targetContainer.innerHTML = `<p style="color: var(--accent-red); text-align:center; padding:20px; font-family: 'Cormorant Garamond', 'STKaiti', 'KaiTi', serif; font-style: italic;">渲染图表时出错: ${error.message}</p>`;
+            showMermaidFeedback(feedbackElem, `渲染图表时出错: ${error.message}`, 'error', 5000);
+            return null;
+        }
+    }
+
+
+
+
+
+    // --- Main Mindmap Logic ---
+    if(mainZoomInBtn) mainZoomInBtn.addEventListener('click', () => {
+        mainCurrentScale += 0.1;
+        const svg = mainMermaidContainer.querySelector('svg');
+        applySvgScale(svg, mainCurrentScale);
+        showMermaidFeedback(mermaidMainFeedbackMessage, `缩放: ${Math.round(mainCurrentScale * 100)}%`, 'info', 1000);
+    });
+
+    if(mainZoomOutBtn) mainZoomOutBtn.addEventListener('click', () => {
+        if (mainCurrentScale > 0.2) {
+            mainCurrentScale -= 0.1;
+            const svg = mainMermaidContainer.querySelector('svg');
+            applySvgScale(svg, mainCurrentScale);
+            showMermaidFeedback(mermaidMainFeedbackMessage, `缩放: ${Math.round(mainCurrentScale * 100)}%`, 'info', 1000);
+        }
+    });
+
+    if(resetZoomBtn) resetZoomBtn.addEventListener('click', () => {
+        mainCurrentScale = 1;
+        const svg = mainMermaidContainer.querySelector('svg');
+        applySvgScale(svg, mainCurrentScale);
+        showMermaidFeedback(mermaidMainFeedbackMessage, '缩放已重置为100%', 'success', 1500);
+    });
+
+    if(mainDownloadDiagramBtn) mainDownloadDiagramBtn.addEventListener('click', () => {
+        const svg = mainMermaidContainer.querySelector('svg');
+        downloadMermaidAsSVG(svg, '核心概念关系图', mermaidMainFeedbackMessage);
+    });
+
+
+
+    // --- Fullscreen Modal Logic for Mermaid ---
+    if(fullscreenOpenBtn) fullscreenOpenBtn.addEventListener('click', async () => {
+        if (!currentMindmapDefinition || currentMindmapDefinition.trim() === "" || currentMindmapDefinition.trim().toLowerCase() === "mindmap") {
+             showMermaidFeedback(mermaidMainFeedbackMessage, '请先生成一个有效的导图才能全屏查看。', 'info');
+             return;
+        }
+        if(fullscreenModal) fullscreenModal.classList.add('active');
+        document.body.classList.add('modal-active');
+        modalCurrentScale = mainCurrentScale;
+        await renderDiagram(currentMindmapDefinition, modalMermaidContainer, {value: modalCurrentScale}, mermaidModalFeedbackMessage, 'modalGeneratedSvgId');
+    });
+
+    if(fullscreenCloseBtn) fullscreenCloseBtn.addEventListener('click', () => {
+        if(fullscreenModal) fullscreenModal.classList.remove('active');
+        document.body.classList.remove('modal-active');
+        if(modalMermaidContainer) {
+            modalMermaidContainer.innerHTML = '';
+            modalMermaidContainer.classList.add('empty');
+        }
+    });
+
+    if(modalZoomInBtn) modalZoomInBtn.addEventListener('click', () => {
+        modalCurrentScale += 0.1;
+        const svg = modalMermaidContainer.querySelector('svg');
+        applySvgScale(svg, modalCurrentScale);
+    });
+
+    if(modalZoomOutBtn) modalZoomOutBtn.addEventListener('click', () => {
+        if (modalCurrentScale > 0.2) {
+            modalCurrentScale -= 0.1;
+            const svg = modalMermaidContainer.querySelector('svg');
+            applySvgScale(svg, modalCurrentScale);
+        }
+    });
+
+    if(modalDownloadDiagramBtn) modalDownloadDiagramBtn.addEventListener('click', () => {
+        const svg = modalMermaidContainer.querySelector('svg');
+        downloadMermaidAsSVG(svg, '核心概念关系图-全屏', mermaidModalFeedbackMessage);
+    });
+
+    // --- 初始化思维导图 ---
+    async function initializeMainDiagram() {
+        if (mainMindmapDiagramDiv && mainMermaidContainer) {
+            const initialDefinition = mainMindmapDiagramDiv.textContent.trim();
+            if (initialDefinition) {
+                await renderDiagram(initialDefinition, mainMermaidContainer, { value: mainCurrentScale }, mermaidMainFeedbackMessage, 'initialMainDiagramSvg');
+            } else {
+                mainMermaidContainer.classList.add('empty');
+            }
+        } else {
+             if(mermaidMainFeedbackMessage && !mainMermaidContainer) showMermaidFeedback(mermaidMainFeedbackMessage, '错误：导图容器未找到。', 'error');
+        }
+    }
+    // --- Mermaid Diagram JavaScript END ---
+
+    // --- Report Page JavaScript START ---
+    function getWebpageNameForFilename() {
+        const pageTitleTag = document.querySelector('title');
+        let baseName = 'AI产品日报';
+        if (pageTitleTag && pageTitleTag.textContent) {
+            const fullTitle = pageTitleTag.textContent.trim();
+            const titleParts = fullTitle.split(' - ');
+            if (titleParts.length > 0 && titleParts[0].trim() !== "" && titleParts[0].trim() !== "[群名称]日报") {
+                baseName = titleParts[0].trim();
+            }
+        }
+        return baseName;
+    }
+
+    function getDateStringForFilename() {
+        const reportDateElement = document.querySelector('.date');
+        let dateStr = "未指定日期";
+        if (reportDateElement && reportDateElement.textContent) {
+            const dateContent = reportDateElement.textContent.trim();
+            if (dateContent && dateContent !== "[日期范围]") {
+                dateStr = dateContent;
+            }
+        }
+        return dateStr;
+    }
+
+    function sanitizeFilename(filename) {
+        return filename.replace(/[^a-z0-9\u4e00-\u9fa5_\-\.\(\)\[\]]/gi, '_').replace(/_+/g, '_');
+    }
+
+    function showReportFeedbackMessage(message, type = 'info', duration = 3000) {
+        const feedbackElement = document.getElementById('feedback-message');
+        if (feedbackElement) {
+            feedbackElement.textContent = message;
+            feedbackElement.className = type;
+            setTimeout(() => {
+                feedbackElement.textContent = '';
+                feedbackElement.className = '';
+            }, duration);
+        }
+    }
+
+    async function captureScreenshot(elementToCapture) {
+        // 检查html2canvas是否可用
+        if (typeof html2canvas === 'undefined') {
+            throw new Error('html2canvas库未正确加载，请刷新页面重试');
+        }
+
+        try {
+            await document.fonts.ready;
+
+            // 简化配置，提高兼容性
+            const canvas = await html2canvas(elementToCapture, {
+                useCORS: true,
+                scale: window.devicePixelRatio || 1,
+                logging: false,
+                backgroundColor: '#f2e8c9',
+                allowTaint: false,
+                foreignObjectRendering: false,
+                imageTimeout: 15000,
+                removeContainer: true,
+                onclone: function(clonedDoc, element) {
+                    try {
+                        // 隐藏操作按钮和反馈消息
+                        const actionButtons = clonedDoc.querySelector('.action-buttons-container');
+                        const feedbackMsg = clonedDoc.querySelector('#feedback-message');
+                        const modalOverlay = clonedDoc.querySelector('.modal-overlay');
+
+                        if (actionButtons) actionButtons.style.display = 'none';
+                        if (feedbackMsg) feedbackMsg.style.display = 'none';
+                        if (modalOverlay) modalOverlay.style.display = 'none';
+
+                        // 确保body样式正确
+                        const clonedBody = clonedDoc.body;
+                        if (clonedBody) {
+                            clonedBody.style.transform = 'none';
+                            clonedBody.style.overflow = 'visible';
+                            clonedBody.style.position = 'static';
+                        }
+
+                        // 处理可能导致问题的SVG元素
+                        const svgElements = clonedDoc.querySelectorAll('svg');
+                        svgElements.forEach(svg => {
+                            svg.style.overflow = 'visible';
+                        });
+
+                    } catch (cloneError) {
+                        console.warn('Clone处理出现警告:', cloneError);
+                        // 不抛出错误，继续截图过程
+                    }
+                }
+            });
+
+            return canvas;
+
+        } catch (error) {
+            console.error('html2canvas错误详情:', error);
+            // 提供更具体的错误信息
+            if (error.message.includes('SecurityError')) {
+                throw new Error('截图失败：页面包含跨域内容，请确保所有资源都来自同一域名');
+            } else if (error.message.includes('timeout')) {
+                throw new Error('截图失败：处理超时，页面内容过于复杂');
+            } else {
+                throw new Error(`截图失败：${error.message || '未知错误，请尝试刷新页面后重试'}`);
+            }
+        }
+    }
+
+    const screenshotToClipboardBtn = document.getElementById('screenshotToClipboardBtn');
+    if(screenshotToClipboardBtn) screenshotToClipboardBtn.addEventListener('click', async function() {
+        const reportContent = document.body;
+        if (!reportContent) {
+            showReportFeedbackMessage('截图错误: 未找到报告内容。', 'error');
+            return;
+        }
+
+        const originalButtonText = this.innerHTML;
+        this.innerHTML = '⏳ 处理中...';
+        this.disabled = true;
+
+        try {
+            showReportFeedbackMessage('正在生成截图，请稍候...', 'info');
+
+            const canvas = await captureScreenshot(reportContent);
+
+            if (!canvas) {
+                throw new Error('截图生成失败，canvas为空');
+            }
+
+            // 使用Promise包装toBlob以便更好地处理错误
+            const blob = await new Promise((resolve, reject) => {
+                canvas.toBlob((blob) => {
+                    if (blob) {
+                        resolve(blob);
+                    } else {
+                        reject(new Error('无法将Canvas转换为Blob'));
+                    }
+                }, 'image/png', 0.95);
+            });
+
+            if (navigator.clipboard && navigator.clipboard.write) {
+                await navigator.clipboard.write([
+                    new ClipboardItem({ 'image/png': blob })
+                ]);
+                showReportFeedbackMessage('✅ 截图已拷贝到剪贴板!', 'success');
+            } else {
+                showReportFeedbackMessage('截图已生成，但您的浏览器不支持直接拷贝图片。请尝试下载截图。', 'error', 5000);
+            }
+
+        } catch (error) {
+            console.error('截图操作失败:', error);
+            showReportFeedbackMessage(`截图失败: ${error.message}`, 'error', 5000);
+        } finally {
+            this.innerHTML = originalButtonText;
+            this.disabled = false;
+        }
+    });
+
+    const screenshotDownloadBtn = document.getElementById('screenshotDownloadBtn');
+    if(screenshotDownloadBtn) screenshotDownloadBtn.addEventListener('click', async function() {
+        const reportContent = document.body;
+        if (!reportContent) {
+            showReportFeedbackMessage('截图错误: 未找到报告内容。', 'error');
+            return;
+        }
+
+        const originalButtonText = this.innerHTML;
+        this.innerHTML = '⏳ 生成中...';
+        this.disabled = true;
+
+        try {
+            showReportFeedbackMessage('正在生成截图，请稍候...', 'info');
+
+            const canvas = await captureScreenshot(reportContent);
+
+            if (!canvas) {
+                throw new Error('截图生成失败，canvas为空');
+            }
+
+            // 使用toDataURL生成图片数据
+            const imageData = canvas.toDataURL('image/png', 0.95);
+
+            if (!imageData || imageData === 'data:,') {
+                throw new Error('无法生成图片数据');
+            }
+
+            // 创建下载链接
+            const link = document.createElement('a');
+            const webpageName = getWebpageNameForFilename();
+            const dateStr = getDateStringForFilename();
+            const filename = sanitizeFilename(`${webpageName}_${dateStr}_截图.png`);
+
+            link.href = imageData;
+            link.download = filename;
+            link.style.display = 'none';
+
+            // 添加到DOM，触发下载，然后移除
+            document.body.appendChild(link);
+            link.click();
+
+            // 延迟移除链接，确保下载开始
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+
+            showReportFeedbackMessage(`✅ 截图已下载: ${filename}`, 'success');
+
+        } catch (error) {
+            console.error('截图下载失败:', error);
+            showReportFeedbackMessage(`截图下载失败: ${error.message}`, 'error', 5000);
+        } finally {
+            this.innerHTML = originalButtonText;
+            this.disabled = false;
+        }
+    });
+
+    const copyHtmlBtn = document.getElementById('copyHtmlBtn');
+    if(copyHtmlBtn) copyHtmlBtn.addEventListener('click', async function() {
+        try {
+            const htmlContent = document.documentElement.outerHTML;
+            await navigator.clipboard.writeText(htmlContent);
+            showReportFeedbackMessage('HTML源码已拷贝到剪贴板!', 'success');
+        } catch (error) {
+            console.error('拷贝HTML失败:', error);
+            showReportFeedbackMessage('拷贝HTML失败: ' + error.message, 'error');
+        }
+    });
+
+    const downloadHtmlBtn = document.getElementById('downloadHtmlBtn');
+    if(downloadHtmlBtn) downloadHtmlBtn.addEventListener('click', function() {
+        try {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+
+            const webpageName = getWebpageNameForFilename();
+            const dateStr = getDateStringForFilename();
+            const filename = sanitizeFilename(`${webpageName}_${dateStr}_报告.html`);
+
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            showReportFeedbackMessage(`HTML报告已下载: ${filename}`, 'success');
+        } catch (error) {
+            console.error('下载HTML失败:', error);
+            showReportFeedbackMessage('下载HTML失败: ' + error.message, 'error');
+        }
+    });
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+        // 检查依赖库是否加载
+        if (typeof mermaid === 'undefined') {
+            showReportFeedbackMessage('Mermaid库未正确加载，思维导图功能可能无法使用', 'error', 5000);
+        }
+        if (typeof html2canvas === 'undefined') {
+            showReportFeedbackMessage('html2canvas库未正确加载，截图功能可能无法使用', 'error', 5000);
+        }
+
+        // 初始化思维导图
+        initializeMainDiagram();
+    });
+    </script>
+
+</body></html>
