@@ -128,12 +128,12 @@ def init_gemini_api(api_key):
         # 'gemini-2.5-pro-preview-05-06',
         # 'gemini-2.5-pro-exp-03-25'  # 这个是免费的。
         # 'gemini-2.5-flash-preview-04-17',
-        model_name = 'models/gemini-2.5-flash-preview-04-17-thinking'  # 默认模型
+        model_name = 'models/gemini-2.5-flash-preview-05-20'  # 默认模型
         selected_model_info = None
 
         # 模型 TPM 配置 (Tokens Per Minute)
         MODEL_CONFIG = {
-            'models/gemini-2.5-flash-preview-04-17-thinking': {
+            'models/gemini-2.5-flash-preview-05-20': {
                 # "name": 'models/gemini-2.5-flash-preview-04-17-thinking',
                 "tpm": 250000,
             },
