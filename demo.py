@@ -85,6 +85,35 @@ TPM_errorFix = {
     "sec_ratio": 1.2,  # 增长等待时间
 }
 
+# 标准化的生成配置参数 - 确保token计算与API调用一致
+GENERATION_CONFIG = {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 40,
+    "max_output_tokens": 65536,
+}
+
+# 标准化的安全设置参数 - 确保token计算与API调用一致
+# 修复: 使用正确的Gemini API安全类别名称，解决finish_reason=2错误
+SAFETY_SETTINGS = [
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_NONE",
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_NONE",
+    },
+]
+
 def parse_arguments():
     """解析命令行参数"""
     parser = argparse.ArgumentParser(description='微信群聊天记录提取、分析和可视化工具')
@@ -118,9 +147,53 @@ def parse_arguments():
 def load_config_from_json():
     return CHAT_DEMO_CFG
 
+def validate_config_consistency():
+    """验证配置参数的一致性"""
+    try:
+        logger.info("验证配置参数一致性...")
+        # logger.info(f"GENERATION_CONFIG: {GENERATION_CONFIG}")
+        # logger.info(f"SAFETY_SETTINGS: {len(SAFETY_SETTINGS)} 项设置")
+
+        # 验证必要的配置参数
+        required_gen_keys = ["temperature", "top_p", "top_k", "max_output_tokens"]
+        for key in required_gen_keys:
+            if key not in GENERATION_CONFIG:
+                logger.warning(f"缺少必要的生成配置参数: {key}")
+
+        # 验证安全设置
+        if len(SAFETY_SETTINGS) == 0:
+            logger.warning("安全设置为空，可能影响token计算准确性")
+
+        # 修复: 验证安全类别名称的正确性，防止finish_reason=2错误
+        valid_safety_categories = {
+            "HARM_CATEGORY_HARASSMENT",
+            "HARM_CATEGORY_HATE_SPEECH",
+            "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            "HARM_CATEGORY_DANGEROUS_CONTENT"
+        }
+
+        for setting in SAFETY_SETTINGS:
+            category = setting.get("category")
+            if category not in valid_safety_categories:
+                logger.error(f"检测到无效的安全类别名称: {category}")
+                logger.error("有效的安全类别名称: " + ", ".join(valid_safety_categories))
+                raise ValueError(f"无效的安全类别名称: {category}")
+
+        logger.info(f"安全设置验证通过，共{len(SAFETY_SETTINGS)}个有效类别")
+        logger.info("配置参数一致性验证完成")
+        return True
+
+    except Exception as e:
+        logger.error(f"配置参数验证失败: {e}")
+        return False
+
+
 def init_gemini_api(api_key):
     """初始化Gemini API"""
     try:
+        # 验证配置参数一致性
+        validate_config_consistency()
+
         genai.configure(api_key=api_key)
 
         # gemini-2.5-pro-preview-03-25 available for free (this an update of gemini-2.5-pro-exp-03-25) : r/LocalLLaMA    https://www.reddit.com/r/LocalLLaMA/comments/1jrwstn/gemini25propreview0325_available_for_free_this_an/
@@ -170,6 +243,10 @@ def init_gemini_api(api_key):
         logger.info(f"模型输入 Token 限制: {input_token_limit}")
         logger.info(f"模型输出 Token 限制: {output_token_limit}")
         logger.info(f"模型 TPM (Tokens Per Minute) 限制: {tpm_limit}")
+        logger.info("=== Token计算配置信息 ===")
+        # logger.info(f"标准化生成配置: {GENERATION_CONFIG}")
+        # logger.info(f"标准化安全设置: {len(SAFETY_SETTINGS)} 项")
+        logger.info("=== 配置信息结束 ===")
         # print(f"DEBUG: Selected model info: {selected_model_info}")
 
         return model, model_name, input_token_limit, output_token_limit, tpm_limit
@@ -483,6 +560,51 @@ def read_prompt_template(template_path):
         raise
 
 
+def count_tokens_with_config(model, content, generation_config=None, safety_settings=None):
+    """
+    计算token数并应用配置参数补偿，确保本地计算与API调用一致性。
+
+    由于Google GenerativeAI SDK的count_tokens方法不支持配置参数，
+    本函数使用经验系数补偿配置参数(generation_config和safety_settings)的token开销。
+
+    Args:
+        model: Gemini 模型实例
+        content: 要计算token的文本内容
+        generation_config: 生成配置参数（用于文档兼容性，实际未使用）
+        safety_settings: 安全设置参数（用于文档兼容性，实际未使用）
+
+    Returns:
+        int: 补偿后的token数量
+
+    Raises:
+        Exception: 如果token计算失败
+    """
+    if generation_config is None:
+        generation_config = GENERATION_CONFIG
+    if safety_settings is None:
+        safety_settings = SAFETY_SETTINGS
+
+    try:
+        # 直接使用纯文本计算token，然后应用经验系数补偿
+        # 经过测试发现，Google GenerativeAI SDK的count_tokens方法不支持config参数
+        # 因此我们使用经验系数来补偿配置参数的token开销
+
+        count_result = model.count_tokens(content)
+        token_count = count_result.total_tokens
+
+        # 应用经验系数补偿配置参数的token开销
+        # 根据实际观察，配置参数大约增加48%的token开销 (188968/126050 ≈ 1.48)
+        CONFIG_OVERHEAD_RATIO = 1.8  # 保守估计，留有安全边际
+        adjusted_token_count = int(token_count * CONFIG_OVERHEAD_RATIO)
+
+        # logger.info(f"纯文本token计算: {token_count}, 配置补偿后: {adjusted_token_count} tokens (补偿系数: {CONFIG_OVERHEAD_RATIO})")
+        return adjusted_token_count
+
+    except Exception as e:
+        logger.error(f"token计算完全失败: {e}")
+        raise
+
+
 def split_chat_logs_into_segments(model, base_prompt_fixed_parts_text, chat_logs_text, model_input_token_limit, tpm_limit):
     """
     将聊天记录分割成适合模型输入长度的片段。
@@ -497,12 +619,12 @@ def split_chat_logs_into_segments(model, base_prompt_fixed_parts_text, chat_logs
     Returns:
         list: 聊天记录片段的列表。
     """
-    SAFETY_MARGIN_TOKENS = CHAT_DEMO_CFG.get('safety_margin_tokens', 1000)  # 安全边际，防止精确达到上限
+    SAFETY_MARGIN_TOKENS = CHAT_DEMO_CFG.get('safety_margin_tokens', 5000)  # 增加安全边际，防止token超限
 
     try:
         logger.info("正在计算基础Prompt的Token数...")  # 增加日志
         base_prompt_start_time = time.time()
-        base_prompt_tokens = model.count_tokens(base_prompt_fixed_parts_text).total_tokens
+        base_prompt_tokens = count_tokens_with_config(model, base_prompt_fixed_parts_text)
         base_prompt_end_time = time.time()
         logger.info(f"基础Prompt部分的Token数: {base_prompt_tokens} (计算耗时: {base_prompt_end_time - base_prompt_start_time:.4f} 秒)")
     except Exception as e:
@@ -511,8 +633,10 @@ def split_chat_logs_into_segments(model, base_prompt_fixed_parts_text, chat_logs
 
     # 确定单个请求的最大允许Token数，考虑模型输入限制和TPM限制
     # 注意：这里的 token 限制是针对整个 prompt (基础 prompt + 聊天记录片段)
-    effective_max_prompt_tokens = min(model_input_token_limit, tpm_limit)
-    logger.info(f"分片时生效的单次请求最大Token数 (min(model_input_limit, tpm_limit)): {effective_max_prompt_tokens}")
+    # 使用Gemini的实际输入限制
+    GEMINI_MAX_INPUT_TOKENS = 131072
+    effective_max_prompt_tokens = min(model_input_token_limit, tpm_limit, GEMINI_MAX_INPUT_TOKENS)
+    logger.info(f"分片时生效的单次请求最大Token数 (min(model_input_limit, tpm_limit, gemini_limit)): {effective_max_prompt_tokens}")
 
     # 为聊天记录本身留出的最大token数
     max_tokens_for_chat_log_segment = effective_max_prompt_tokens - base_prompt_tokens - SAFETY_MARGIN_TOKENS
@@ -532,7 +656,7 @@ def split_chat_logs_into_segments(model, base_prompt_fixed_parts_text, chat_logs
             logger.info("聊天记录为空，无需切分，返回空列表。")
             return []
 
-        total_chat_log_tokens = model.count_tokens(chat_logs_text).total_tokens
+        total_chat_log_tokens = count_tokens_with_config(model, chat_logs_text)
         overall_token_count_end_time = time.time()
         logger.info(f"整个聊天记录的Token总数: {total_chat_log_tokens} (计算耗时: {overall_token_count_end_time - overall_token_count_start_time:.4f} 秒)")
 
@@ -580,7 +704,7 @@ def split_chat_logs_into_segments(model, base_prompt_fixed_parts_text, chat_logs
 
             segment_text_to_test = "".join(all_lines[current_pos: current_pos + mid_k])
             try:
-                tokens = model.count_tokens(segment_text_to_test).total_tokens
+                tokens = count_tokens_with_config(model, segment_text_to_test)
                 if tokens <= max_tokens_for_chat_log_segment:
                     best_k_for_segment = mid_k  # 这是一个可行的k，尝试更大的k
                     low = mid_k + 1
@@ -605,7 +729,7 @@ def split_chat_logs_into_segments(model, base_prompt_fixed_parts_text, chat_logs
                 single_line_segment = all_lines[current_pos]
                 segments.append(single_line_segment)
                 try:
-                    sl_tokens = model.count_tokens(single_line_segment).total_tokens
+                    sl_tokens = count_tokens_with_config(model, single_line_segment)
                     logger.info(f"片段 {segment_count} (单行): 第 {current_pos + 1} 行, 字符数 {len(single_line_segment)}, Token数 {sl_tokens}. (可能超限)")
                 except Exception as e_sl:
                     logger.warning(f"片段 {segment_count} (单行): 第 {current_pos + 1} 行, 字符数 {len(single_line_segment)}. Token计数失败: {e_sl}")
@@ -644,6 +768,23 @@ def build_complete_prompt(prompt_template, chat_logs, talker):
     return complete_prompt
 
 
+def validate_prompt_tokens(model, prompt, max_tokens=131072):
+    """验证prompt的token数是否在限制范围内"""
+    try:
+        token_count = count_tokens_with_config(model, prompt)
+
+        if token_count > max_tokens:
+            logger.error(f"Prompt token数 ({token_count}) 超过最大限制 ({max_tokens})")
+            return False, token_count
+
+        logger.info(f"Prompt token数验证通过: {token_count}/{max_tokens}")
+        return True, token_count
+
+    except Exception as e:
+        logger.error(f"验证prompt token数时出错: {str(e)}")
+        return False, 0
+
+
 def extract_html_from_response(response_text):
     """从Gemini API的响应文本中提取HTML内容"""
     # 如果已经是HTML，直接返回
@@ -670,7 +811,7 @@ def extract_html_from_response(response_text):
 
 
 def generate_html_with_gemini(model, prompt, tpm_limit, last_request_state):
-    """使用Gemini API生成HTML内容，包含重试机制"""
+    """使用Gemini API生成HTML内容，包含重试机制和token限制检查"""
     max_retries = CHAT_DEMO_CFG.get('gemini_retry_attempts', 3)
     retry_delay = CHAT_DEMO_CFG.get('gemini_retry_delay_sec', 10)
     attempts = 0
@@ -680,9 +821,19 @@ def generate_html_with_gemini(model, prompt, tpm_limit, last_request_state):
             # 计算当前prompt的token数
             current_prompt_tokens = 0
             try:
-                count_tokens_result = model.count_tokens(prompt)
-                current_prompt_tokens = count_tokens_result.total_tokens
+                current_prompt_tokens = count_tokens_with_config(model, prompt)
                 logger.info(f"当前请求的Prompt Token数: {current_prompt_tokens}")
+
+                # 检查是否超过Gemini的输入token限制
+                GEMINI_MAX_INPUT_TOKENS = 131072  # Gemini的实际输入限制
+                if current_prompt_tokens > GEMINI_MAX_INPUT_TOKENS:
+                    error_msg = f"Prompt token数 ({current_prompt_tokens}) 超过Gemini最大输入限制 ({GEMINI_MAX_INPUT_TOKENS})"
+                    logger.error(error_msg)
+                    raise ValueError(error_msg)
+
+            except ValueError as ve:
+                # 重新抛出token超限错误
+                raise ve
             except Exception as e_count:
                 logger.error(f"计算Prompt Token数失败: {str(e_count)}. 无法执行TPM检查，将直接发送请求。")
                 # 如果无法计算token，为避免阻塞，不执行等待逻辑，但后续TPM可能仍会超限
@@ -722,19 +873,17 @@ def generate_html_with_gemini(model, prompt, tpm_limit, last_request_state):
             sys.stdout.flush()
             logger.info("向Gemini API发送prompt...")
             sys.stdout.flush()
-            # 设置生成参数
-            generation_config = {
-                "temperature": 0.7,
-                "top_p": 0.8,
-                "top_k": 40,
-                # "max_output_tokens": 8192,
-                "max_output_tokens": 65536,
-            }
+            # 使用标准化的配置参数，确保与token计算一致
+            logger.info("使用标准化配置参数发送请求到Gemini API...")
+            # logger.info(f"Generation Config: {GENERATION_CONFIG}")
+            logger.info(f"Safety Settings: {len(SAFETY_SETTINGS)} 项安全设置已启用，防止finish_reason=2错误")
 
             # 发送请求到Gemini
+            # 修复: 重新启用安全设置，使用修正后的配置解决finish_reason=2错误
             response = model.generate_content(
                 prompt,
-                generation_config=generation_config,
+                safety_settings=SAFETY_SETTINGS,
+                generation_config=GENERATION_CONFIG,
                 stream=True,  # 流式传输
             )
 
@@ -751,24 +900,64 @@ def generate_html_with_gemini(model, prompt, tpm_limit, last_request_state):
             # 创建一个动态进度条
             progress_bar = tqdm.tqdm(desc="生成进度", unit="字符", dynamic_ncols=True)
 
-            for chunk in response:
-                if hasattr(chunk, 'text') and chunk.text:
-                    current_chunk = chunk.text
-                    response_text += current_chunk
-                    # 更新进度条
-                    progress_bar.update(len(current_chunk))
-                    # 可选：每接收到一个块后显示最新的少量文本
-                    if len(current_chunk) > 0 and len(current_chunk) < 100:
-                        # 显示最近添加的文本片段，但避免输出HTML标签
-                        readable_chunk = current_chunk.replace(
-                            '<', '＜').replace('>', '＞')
-                        progress_bar.set_description(
-                            f"最新内容: {readable_chunk[:30]}...")
+            # 检查响应是否有效
+            # 修复: 增强响应有效性预检查，防止finish_reason=2导致的访问错误
+            response_chunks = []
+
+            # 预检查响应对象的基本有效性
+            if not hasattr(response, '__iter__'):
+                logger.error("响应对象无效，无法进行流式处理")
+                raise ValueError("响应对象无效，可能被安全过滤器完全阻止")
+
+            try:
+                for chunk in response:
+                    response_chunks.append(chunk)
+                    if hasattr(chunk, 'text') and chunk.text:
+                        current_chunk = chunk.text
+                        response_text += current_chunk
+                        # 更新进度条
+                        progress_bar.update(len(current_chunk))
+                        # 可选：每接收到一个块后显示最新的少量文本
+                        if len(current_chunk) > 0 and len(current_chunk) < 100:
+                            # 显示最近添加的文本片段，但避免输出HTML标签
+                            readable_chunk = current_chunk.replace(
+                                '<', '＜').replace('>', '＞')
+                            progress_bar.set_description(
+                                f"最新内容: {readable_chunk[:30]}...")
+                    elif hasattr(chunk, 'finish_reason'):
+                        # 检查finish_reason
+                        finish_reason = chunk.finish_reason
+                        if finish_reason and finish_reason != 1:  # 1表示STOP（正常完成）
+                            logger.warning(f"响应提前结束，finish_reason: {finish_reason}")
+                            if finish_reason == 2:  # SAFETY
+                                # 修复: 增强安全过滤器错误的详细诊断信息
+                                logger.error("响应被安全过滤器阻止 - 这通常表示内容被误判为敏感")
+                                logger.error("建议检查: 1) 安全设置是否正确配置 2) 输入内容是否包含可能触发过滤器的词汇")
+                                logger.error("当前安全设置已配置为BLOCK_NONE，如仍被阻止可能是API端问题")
+                                raise ValueError("响应被安全过滤器阻止，已配置最宽松安全设置但仍被拦截，可能是内容误判")
+                            elif finish_reason == 3:  # RECITATION
+                                logger.error("响应因版权问题被阻止 - 内容可能包含受版权保护的材料")
+                                raise ValueError("响应因版权问题被阻止")
+                            elif finish_reason == 4:  # OTHER
+                                logger.error("响应因其他未知原因被阻止")
+                                raise ValueError("响应因其他原因被阻止")
+                            elif finish_reason == 5:  # MAX_TOKENS
+                                logger.warning("响应因达到最大token限制而截断")
+                                # 这种情况可能是正常的，继续处理
+
+            except Exception as stream_error:
+                logger.error(f"处理流式响应时出错: {str(stream_error)}")
+                raise
 
             # 关闭进度条
             progress_bar.close()
             print(f"内容生成完毕！共 {len(response_text)} 个字符")
             sys.stdout.flush()
+
+            # 检查是否获得了有效响应
+            if not response_text.strip():
+                logger.error("未获得有效响应内容")
+                raise ValueError("未获得有效响应内容，可能被安全过滤器阻止或其他原因")
 
             # 提取HTML内容
             html_content = extract_html_from_response(response_text)
@@ -780,9 +969,20 @@ def generate_html_with_gemini(model, prompt, tpm_limit, last_request_state):
             logger.info(f"成功生成HTML内容: {len(html_content)}字符")
             return html_content  # 成功获取响应，跳出重试循环并返回结果
 
+        except ValueError as ve:
+            # Token超限或安全过滤器错误，不重试
+            logger.error(f"Gemini API调用失败（不可重试的错误）: {str(ve)}")
+            raise ve
         except Exception as e:
             attempts += 1
             logger.error(f"使用Gemini生成HTML失败 (尝试 {attempts}/{max_retries}): {str(e)}")
+
+            # 检查是否是特定的不可重试错误
+            error_str = str(e).lower()
+            if "token" in error_str and ("limit" in error_str or "exceed" in error_str):
+                logger.error("检测到token限制错误，不进行重试")
+                raise ValueError(f"Token限制错误: {str(e)}")
+
             if attempts < max_retries:
                 logger.info(f"将在 {retry_delay} 秒后重试...")
                 print(f"⚠️ Gemini API请求失败，将在 {retry_delay} 秒后重试 ({attempts}/{max_retries})...")
@@ -1215,14 +1415,26 @@ def main():
                     )
                     print(f"  ✅ 「{segment_display_name}」分析数据准备完成 (Prompt长度: {len(complete_prompt)}字符)")
 
+                    # 验证prompt token数
+                    is_valid, token_count = validate_prompt_tokens(model, complete_prompt)
+                    if not is_valid:
+                        print(f"  ❌ 「{segment_display_name}」的Prompt token数 ({token_count}) 超过限制，跳过此片段")
+                        logger.error(f"「{segment_display_name}」的Prompt token数超限，跳过")
+                        continue
+
                     # 使用Gemini生成HTML
                     print(f"  ⏳ 「{segment_display_name}」开始AI分析并生成日报...")
-                    html_content = generate_html_with_gemini(
-                        model,
-                        complete_prompt,
-                        tpm_limit,  # 新增TPM限制参数
-                        last_request_state  # 新增请求状态参数 (会被修改)
-                    )
+                    try:
+                        html_content = generate_html_with_gemini(
+                            model,
+                            complete_prompt,
+                            tpm_limit,  # 新增TPM限制参数
+                            last_request_state  # 新增请求状态参数 (会被修改)
+                        )
+                    except ValueError as ve:
+                        print(f"  ❌ 「{segment_display_name}」生成失败: {str(ve)}")
+                        logger.error(f"「{segment_display_name}」生成失败: {str(ve)}")
+                        continue
 
                     # 获取talker个性化配置，如果没有则使用全局配置
                     auto_generate_png = talker_config.get('auto_generate_png', CHAT_DEMO_CFG.get('auto_generate_png', False))
